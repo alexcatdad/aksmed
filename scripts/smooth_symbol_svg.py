@@ -23,7 +23,8 @@ THICKNESS_SCALE = 1.00
 THICKNESS_MIN = 2
 THICKNESS_MAX = 4
 END_CAP_EXTRA = 0.20
-END_CAP_TRIM_BIAS = 1.20
+END_CAP_TRIM_BIAS = 1.80
+END_CAP_EXTENSION_FACTOR = 0.50
 
 
 def polygon_area(pts: np.ndarray) -> float:
@@ -169,6 +170,43 @@ def _flatten_end_caps(mask: np.ndarray, skeleton: np.ndarray, half_w: int) -> np
     return out
 
 
+def _extend_end_caps(mask: np.ndarray, skeleton: np.ndarray, half_w: int) -> np.ndarray:
+    # Extend open terminals along their local tangent so endpoints sit closer
+    # to neighboring paths without changing interior geometry.
+    n = convolve(skeleton.astype(np.int32), np.ones((3, 3), dtype=np.int32), mode="constant", cval=0)
+    neighbor_count = n - skeleton.astype(np.int32)
+    endpoints = np.argwhere(skeleton & (neighbor_count == 1))
+
+    out = mask.copy()
+    extension = int(round(half_w * END_CAP_EXTENSION_FACTOR))
+    if extension < 1:
+        return out
+
+    brush_r = max(1, int(round(half_w * 0.95)))
+    h, w = mask.shape
+    rr = float(brush_r * brush_r)
+
+    for y0, x0 in endpoints:
+        t = _estimate_tangent(skeleton, (int(y0), int(x0)))
+        if t is None:
+            continue
+
+        for step in range(1, extension + 1):
+            cy = float(y0) + t[0] * step
+            cx = float(x0) + t[1] * step
+
+            y_min = max(0, int(np.floor(cy - brush_r)))
+            y_max = min(h, int(np.ceil(cy + brush_r)) + 1)
+            x_min = max(0, int(np.floor(cx - brush_r)))
+            x_max = min(w, int(np.ceil(cx + brush_r)) + 1)
+
+            yy, xx = np.mgrid[y_min:y_max, x_min:x_max]
+            add = ((yy - cy) ** 2 + (xx - cx) ** 2) <= rr
+            out[y_min:y_max, x_min:x_max] |= add
+
+    return out
+
+
 def normalize_line_thickness(mask: np.ndarray) -> np.ndarray:
     # Convert varying-width glow traces to a stable-width binary shape:
     # 1) centerline extraction, 2) fixed-radius redraw.
@@ -187,6 +225,7 @@ def normalize_line_thickness(mask: np.ndarray) -> np.ndarray:
     )
     normalized = morphology.binary_dilation(skel, morphology.disk(half_w))
     normalized = _flatten_end_caps(normalized, skel, half_w)
+    normalized = _extend_end_caps(normalized, skel, half_w)
     normalized = morphology.binary_opening(normalized, morphology.disk(1))
     normalized = morphology.binary_closing(normalized, morphology.disk(1))
     normalized = morphology.remove_small_holes(normalized, area_threshold=24)
