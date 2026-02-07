@@ -68,8 +68,11 @@
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 14px;
+    }
+    .card.full-width {
+      grid-column: 1 / -1;
     }
     .card {
       background: linear-gradient(180deg, #1b2130, var(--panel));
@@ -92,7 +95,10 @@
       background: #fff;
     }
     .frame.dark { background: #0c0f15; }
-    .frame.wide { aspect-ratio: 16 / 7; }
+    .frame.wide {
+      aspect-ratio: 22 / 6;
+      min-height: 280px;
+    }
     .frame img,
     .frame svg {
       width: 100%;
@@ -158,6 +164,18 @@
       margin-top: 10px;
       font-size: 0.84rem;
       color: #9eb1da;
+    }
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      .card.full-width {
+        grid-column: auto;
+      }
+      .frame.wide {
+        aspect-ratio: 16 / 7;
+        min-height: 220px;
+      }
     }
   </style>
 </head>
@@ -229,7 +247,7 @@
         <div id="editable-preview" class="frame"></div>
       </section>
 
-      <section class="card">
+      <section class="card full-width">
         <h2>Horizontal Lockup (Logo Left, Text Right)</h2>
         <div class="controls">
           <label>One-Line Text<input id="h-text" type="text" value="AKSMED CLINIQUE" /></label>
@@ -266,10 +284,10 @@
             </div>
           </label>
 
-          <label>Logo Scale
+          <label>Logo Scale (%)
             <div class="range-row">
-              <input id="h-logo-scale" type="range" min="0.5" max="1.6" step="0.01" value="1.0" />
-              <output id="h-logo-scale-val">1.00x</output>
+              <input id="h-logo-scale" type="range" min="40" max="180" step="1" value="100" />
+              <output id="h-logo-scale-val">100%</output>
             </div>
           </label>
 
@@ -537,7 +555,8 @@
       const letterSpacing = parseFloat(q('h-letter-spacing').value);
       const fontWeight = parseInt(q('h-font-weight').value, 10);
       const strokeThickness = parseFloat(q('h-stroke-thickness').value);
-      const logoScale = parseFloat(q('h-logo-scale').value);
+      const logoScalePct = parseFloat(q('h-logo-scale').value);
+      const logoScale = logoScalePct / 100;
       const gap = parseFloat(q('h-gap').value);
       const isItalic = q('h-font-italic').checked;
       const isSmallCaps = q('h-font-small-caps').checked;
@@ -546,7 +565,7 @@
       setOutput('h-letter-spacing-val', `${letterSpacing.toFixed(1)} px`);
       setOutput('h-font-weight-val', `${fontWeight}`);
       setOutput('h-stroke-thickness-val', `${strokeThickness.toFixed(2)} px`);
-      setOutput('h-logo-scale-val', `${logoScale.toFixed(2)}x`);
+      setOutput('h-logo-scale-val', `${logoScalePct.toFixed(0)}%`);
       setOutput('h-gap-val', `${gap.toFixed(0)} px`);
 
       const base = state.symbolSvgTemplate;
