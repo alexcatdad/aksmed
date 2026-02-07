@@ -6,6 +6,9 @@
   <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baskervville:ital@0;1&family=Cormorant+Garamond:wght@500;600;700&family=Crimson+Text:wght@600;700&family=EB+Garamond:wght@500;600;700&family=Libre+Baskerville:wght@400;700&family=Lora:wght@500;600;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@600;700&family=Source+Serif+4:wght@500;600;700&display=swap" rel="stylesheet" />
   <title>AKSMED Logo Preview (Latest)</title>
   <style>
     :root {
@@ -124,6 +127,14 @@
       background: #0f141d;
       color: var(--text);
     }
+    select {
+      border: 1px solid #2a3140;
+      border-radius: 7px;
+      padding: 8px 10px;
+      font-size: 0.96rem;
+      background: #0f141d;
+      color: var(--text);
+    }
     .status {
       margin-top: 10px;
       font-size: 0.84rem;
@@ -146,6 +157,7 @@
       <a class="btn" href="logo-symbol.svg" download>Download Symbol SVG</a>
       <a class="btn" href="logo-editable.svg" download>Download Editable SVG</a>
       <a class="btn" href="logo-laser.svg" download>Download Laser SVG</a>
+      <button id="download-current-btn" class="btn" type="button">Download Current Editable</button>
       <button id="refresh-btn" class="btn" type="button">Refresh Latest</button>
       <label class="small"><input id="auto-refresh" type="checkbox" checked />Auto refresh (2s)</label>
     </div>
@@ -171,6 +183,20 @@
         <div class="editor">
           <label>Line 1<input id="line1" type="text" value="AKSMED" /></label>
           <label>Line 2<input id="line2" type="text" value="CLINIQUE" /></label>
+          <label>Serif Font
+            <select id="font-picker">
+              <option value="Playfair Display, Georgia, serif">Playfair Display</option>
+              <option value="Cormorant Garamond, Garamond, serif">Cormorant Garamond</option>
+              <option value="EB Garamond, Garamond, serif">EB Garamond</option>
+              <option value="Source Serif 4, Georgia, serif">Source Serif 4</option>
+              <option value="Libre Baskerville, Baskerville, serif">Libre Baskerville</option>
+              <option value="Lora, Georgia, serif">Lora</option>
+              <option value="Merriweather, Georgia, serif">Merriweather</option>
+              <option value="Crimson Text, Georgia, serif">Crimson Text</option>
+              <option value="Baskervville, Baskerville, serif">Baskervville</option>
+              <option value="Times New Roman, Times, serif">Times New Roman</option>
+            </select>
+          </label>
         </div>
         <div id="editable-preview" class="frame"></div>
       </section>
@@ -203,10 +229,31 @@
       if (!state.editableSvg) return;
       const l1 = document.getElementById('line1').value || ' ';
       const l2 = document.getElementById('line2').value || ' ';
+      const font = document.getElementById('font-picker').value;
       const t1 = state.editableSvg.querySelector('#line1');
       const t2 = state.editableSvg.querySelector('#line2');
-      if (t1) t1.textContent = l1;
-      if (t2) t2.textContent = l2;
+      if (t1) {
+        t1.textContent = l1;
+        t1.setAttribute('font-family', font);
+      }
+      if (t2) {
+        t2.textContent = l2;
+        t2.setAttribute('font-family', font);
+      }
+    }
+
+    function downloadCurrentEditable() {
+      if (!state.editableSvg) return;
+      const serialized = new XMLSerializer().serializeToString(state.editableSvg);
+      const blob = new Blob([serialized], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'logo-editable-current.svg';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
     }
 
     async function loadLatest() {
@@ -248,9 +295,11 @@
     }
 
     document.getElementById('refresh-btn').addEventListener('click', loadLatest);
+    document.getElementById('download-current-btn').addEventListener('click', downloadCurrentEditable);
     document.getElementById('auto-refresh').addEventListener('change', (e) => setAutoRefresh(e.target.checked));
     document.getElementById('line1').addEventListener('input', applyEditableText);
     document.getElementById('line2').addEventListener('input', applyEditableText);
+    document.getElementById('font-picker').addEventListener('change', applyEditableText);
 
     setAutoRefresh(true);
     loadLatest();
