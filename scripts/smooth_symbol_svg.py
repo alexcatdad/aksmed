@@ -15,6 +15,9 @@ BLUR_SIGMA = 1.25
 CONTOUR_SMOOTH_SIGMA = 1.8
 SIMPLIFY_TOLERANCE = 1.15
 MIN_AREA = 25
+HANDLE_CLAMP_RATIO = 0.42
+SHARP_CORNER_COS = 0.40
+SHARP_TENSION = 0.12
 
 
 def polygon_area(pts: np.ndarray) -> float:
@@ -34,8 +37,44 @@ def catmull_rom_to_bezier(points: np.ndarray) -> str:
         p2 = points[(i + 1) % n].astype(float)
         p3 = points[(i + 2) % n].astype(float)
 
+        seg = p2 - p1
+        seg_len = np.linalg.norm(seg)
+        if seg_len < 1e-9:
+            continue
+
         cp1 = p1 + (p2 - p0) / 6.0
         cp2 = p2 - (p3 - p1) / 6.0
+
+        # Clamp handle lengths to avoid overshoot/kinks at line-curve transitions.
+        handle_limit = HANDLE_CLAMP_RATIO * seg_len
+        h1 = cp1 - p1
+        h2 = cp2 - p2
+        h1_len = np.linalg.norm(h1)
+        h2_len = np.linalg.norm(h2)
+        if h1_len > handle_limit and h1_len > 1e-9:
+            cp1 = p1 + h1 * (handle_limit / h1_len)
+        if h2_len > handle_limit and h2_len > 1e-9:
+            cp2 = p2 + h2 * (handle_limit / h2_len)
+
+        # Reduce tangents around sharp corners to keep joins cleaner.
+        v_in_1 = p1 - p0
+        v_out_1 = p2 - p1
+        l_in_1 = np.linalg.norm(v_in_1)
+        l_out_1 = np.linalg.norm(v_out_1)
+        if l_in_1 > 1e-9 and l_out_1 > 1e-9:
+            cos_1 = float(np.dot(v_in_1, v_out_1) / (l_in_1 * l_out_1))
+            if cos_1 < SHARP_CORNER_COS:
+                cp1 = p1 + v_out_1 * SHARP_TENSION
+
+        v_in_2 = p2 - p1
+        v_out_2 = p3 - p2
+        l_in_2 = np.linalg.norm(v_in_2)
+        l_out_2 = np.linalg.norm(v_out_2)
+        if l_in_2 > 1e-9 and l_out_2 > 1e-9:
+            cos_2 = float(np.dot(v_in_2, v_out_2) / (l_in_2 * l_out_2))
+            if cos_2 < SHARP_CORNER_COS:
+                cp2 = p2 - v_in_2 * SHARP_TENSION
+
         d.append(
             f"C {cp1[0]:.2f} {cp1[1]:.2f} "
             f"{cp2[0]:.2f} {cp2[1]:.2f} "
