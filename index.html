@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
   <title>AKSMED Editable Preview</title>
   <style>
     :root {
@@ -116,7 +116,7 @@
       font-size: 0.84rem;
       color: var(--muted);
     }
-    input, select {
+    input:not([type="checkbox"]), select {
       border: 1px solid #2a3140;
       border-radius: 7px;
       padding: 8px 10px;
@@ -127,6 +127,19 @@
     input[type="range"] {
       padding: 0;
       accent-color: var(--accent);
+    }
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--accent);
+      margin: 0;
+    }
+    .toggle {
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding-top: 4px;
+      color: #d5ddf2;
     }
     .range-row {
       display: flex;
@@ -193,6 +206,23 @@
               <output id="line-spacing-val">1.00x</output>
             </div>
           </label>
+
+          <label>Font Weight (Thickness)
+            <div class="range-row">
+              <input id="font-weight" type="range" min="300" max="700" step="100" value="700" />
+              <output id="font-weight-val">700</output>
+            </div>
+          </label>
+
+          <label>Extra Stroke Thickness
+            <div class="range-row">
+              <input id="stroke-thickness" type="range" min="0" max="1.2" step="0.05" value="0" />
+              <output id="stroke-thickness-val">0.00 px</output>
+            </div>
+          </label>
+
+          <label class="toggle"><input id="font-italic" type="checkbox" /> Italic</label>
+          <label class="toggle"><input id="font-small-caps" type="checkbox" /> Small Caps</label>
         </div>
 
         <div id="editable-preview" class="frame"></div>
@@ -295,7 +325,7 @@
       link.id = id;
       link.rel = 'stylesheet';
       const familyParam = encodeURIComponent(family).replace(/%20/g, '+');
-      link.href = `https://fonts.googleapis.com/css2?family=${familyParam}&display=swap`;
+      link.href = `https://fonts.googleapis.com/css2?family=${familyParam}:wght@300;400;500;600;700&display=swap`;
       document.head.appendChild(link);
       state.loadedGoogleFonts.add(family);
     }
@@ -341,6 +371,10 @@
       const y2 = parseFloat(t2.getAttribute('y') || '0');
       const fs = parseFloat(t1.getAttribute('font-size') || '109');
       const ls = parseFloat(t1.getAttribute('letter-spacing') || '2');
+      const fw = parseFloat(t1.getAttribute('font-weight') || '700');
+      const style = t1.getAttribute('font-style') || 'normal';
+      const variant = t1.getAttribute('font-variant') || 'normal';
+      const sw = parseFloat(t1.getAttribute('stroke-width') || '0');
 
       state.baseY1 = y1;
       state.baseY2 = y2;
@@ -351,6 +385,10 @@
       q('letter-spacing').value = String(ls);
       const lineSpace = (y2 > y1 && fs > 0) ? ((y2 - y1) / fs) : 1.0;
       q('line-spacing').value = String(Math.max(0.7, Math.min(1.6, lineSpace)));
+      q('font-weight').value = String(Math.max(300, Math.min(700, Math.round(fw / 100) * 100)));
+      q('font-italic').checked = style === 'italic';
+      q('font-small-caps').checked = variant === 'small-caps';
+      q('stroke-thickness').value = String(Math.max(0, Math.min(1.2, sw)));
     }
 
     function applyControls() {
@@ -366,10 +404,16 @@
       const fontSize = parseFloat(q('font-size').value);
       const letterSpacing = parseFloat(q('letter-spacing').value);
       const lineSpacing = parseFloat(q('line-spacing').value);
+      const fontWeight = parseInt(q('font-weight').value, 10);
+      const isItalic = q('font-italic').checked;
+      const isSmallCaps = q('font-small-caps').checked;
+      const strokeThickness = parseFloat(q('stroke-thickness').value);
 
       setOutput('font-size-val', `${fontSize.toFixed(0)} px`);
       setOutput('letter-spacing-val', `${letterSpacing.toFixed(1)} px`);
       setOutput('line-spacing-val', `${lineSpacing.toFixed(2)}x`);
+      setOutput('font-weight-val', `${fontWeight}`);
+      setOutput('stroke-thickness-val', `${strokeThickness.toFixed(2)} px`);
 
       const t1 = state.editableSvg.querySelector('#line1');
       const t2 = state.editableSvg.querySelector('#line2');
@@ -382,6 +426,22 @@
         t.setAttribute('font-family', font);
         t.setAttribute('font-size', String(fontSize));
         t.setAttribute('letter-spacing', String(letterSpacing));
+        t.setAttribute('font-weight', String(fontWeight));
+        t.setAttribute('font-style', isItalic ? 'italic' : 'normal');
+        t.setAttribute('font-variant', isSmallCaps ? 'small-caps' : 'normal');
+        if (strokeThickness > 0) {
+          t.setAttribute('stroke', '#000000');
+          t.setAttribute('stroke-width', String(strokeThickness));
+          t.setAttribute('paint-order', 'stroke fill');
+          t.setAttribute('stroke-linejoin', 'round');
+          t.setAttribute('stroke-linecap', 'round');
+        } else {
+          t.removeAttribute('stroke');
+          t.removeAttribute('stroke-width');
+          t.removeAttribute('paint-order');
+          t.removeAttribute('stroke-linejoin');
+          t.removeAttribute('stroke-linecap');
+        }
       }
 
       t1.setAttribute('y', String(y1));
@@ -432,6 +492,10 @@
     q('font-size').addEventListener('input', applyControls);
     q('letter-spacing').addEventListener('input', applyControls);
     q('line-spacing').addEventListener('input', applyControls);
+    q('font-weight').addEventListener('input', applyControls);
+    q('font-italic').addEventListener('change', applyControls);
+    q('font-small-caps').addEventListener('change', applyControls);
+    q('stroke-thickness').addEventListener('input', applyControls);
 
     loadLatest();
   </script>
