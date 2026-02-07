@@ -3,373 +3,257 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AKSMED Logo Vector Preview</title>
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>AKSMED Logo Preview (Latest)</title>
   <style>
     :root {
-      --bg: #0f1115;
-      --panel: #171a21;
-      --line: #2d3340;
-      --text: #eef1f7;
-      --muted: #b5bed3;
-      --accent: #f2d07f;
+      --bg: #101218;
+      --panel: #171b24;
+      --line: #2a3140;
+      --text: #edf2ff;
+      --muted: #b6bfd7;
+      --accent: #efd187;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top right, #1e2430, var(--bg) 45%);
       color: var(--text);
+      background: radial-gradient(circle at 90% 10%, #20283a, var(--bg) 48%);
     }
     .wrap {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 24px;
+      padding: 20px;
     }
     h1 {
-      margin: 0 0 8px;
-      font-size: 1.6rem;
-      letter-spacing: 0.02em;
+      margin: 0 0 6px;
+      font-size: 1.55rem;
     }
     p {
-      margin: 0 0 16px;
+      margin: 0 0 14px;
       color: var(--muted);
     }
     .actions {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
+      align-items: center;
     }
-    a.btn {
-      text-decoration: none;
-      color: #141414;
-      background: var(--accent);
-      border: 1px solid #e4bc5d;
+    .btn {
+      display: inline-block;
+      border: 1px solid #e0be67;
       border-radius: 8px;
-      padding: 8px 12px;
+      background: var(--accent);
+      color: #171717;
+      text-decoration: none;
       font-weight: 700;
       font-size: 0.92rem;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+    .small {
+      font-size: 0.84rem;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-left: 4px;
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 14px;
     }
     .card {
-      background: linear-gradient(180deg, #1b1f29, var(--panel));
+      background: linear-gradient(180deg, #1b2130, var(--panel));
       border: 1px solid var(--line);
       border-radius: 12px;
-      padding: 12px;
+      padding: 10px;
     }
     .card h2 {
-      margin: 0 0 10px;
+      margin: 0 0 8px;
       font-size: 1rem;
-      color: #dce3f8;
-      font-weight: 700;
     }
     .frame {
+      border: 1px solid #2a3140;
+      border-radius: 9px;
+      background: #fff;
       width: 100%;
-      aspect-ratio: 1/1;
-      background: #0b0d12;
-      border: 1px solid #2b3242;
-      border-radius: 8px;
+      aspect-ratio: 1 / 1;
       overflow: hidden;
       display: grid;
       place-items: center;
     }
-    .frame.white { background: #fff; }
-    img, object {
-      max-width: 100%;
-      max-height: 100%;
+    .frame.dark {
+      background: #0c0f15;
+    }
+    .frame img,
+    .frame svg {
       width: 100%;
       height: 100%;
       object-fit: contain;
       display: block;
     }
-    .note {
-      margin-top: 14px;
-      font-size: 0.9rem;
-      color: #a8b2c9;
+    #symbol-preview svg,
+    #editable-preview svg {
+      shape-rendering: geometricPrecision;
+      text-rendering: geometricPrecision;
     }
-    .metrics {
-      margin-top: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 10px;
-    }
-    .metric {
-      background: #151926;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 10px;
-    }
-    .metric .k {
-      display: block;
-      font-size: 0.8rem;
-      color: #9cabcb;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-    .metric .v {
-      display: block;
-      margin-top: 4px;
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: #f8fbff;
-    }
-    .iter-wrap {
-      margin-top: 20px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: linear-gradient(180deg, #1a1f2b, #141923);
-      overflow: hidden;
-    }
-    .iter-head {
-      padding: 12px;
-      border-bottom: 1px solid var(--line);
-      color: #d5def5;
-      font-weight: 700;
-    }
-    .iter-table-wrap {
-      overflow: auto;
-      max-height: 350px;
-      border-bottom: 1px solid var(--line);
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      min-width: 980px;
-      font-size: 0.9rem;
-    }
-    th, td {
-      border-bottom: 1px solid #2a3243;
-      padding: 8px 10px;
-      text-align: left;
-      white-space: nowrap;
-    }
-    th {
-      position: sticky;
-      top: 0;
-      background: #171d29;
-      color: #c6d2ee;
-      z-index: 1;
-    }
-    .iter-cards {
-      padding: 12px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 10px;
-    }
-    .mini {
-      border: 1px solid #2a3243;
-      border-radius: 10px;
-      background: #101520;
-      padding: 8px;
-    }
-    .mini .meta {
-      display: flex;
-      justify-content: space-between;
-      gap: 8px;
-      margin-bottom: 8px;
-      font-size: 0.84rem;
-      color: #b6c3df;
-    }
-    .mini .frame {
-      aspect-ratio: 3 / 4;
-    }
-    .editor-controls {
+    .editor {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 10px;
-      margin-bottom: 10px;
+      gap: 8px;
+      margin-bottom: 8px;
     }
-    .field {
+    label {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      font-size: 0.85rem;
-      color: #b5c1db;
+      gap: 5px;
+      font-size: 0.84rem;
+      color: var(--muted);
     }
-    .field input {
-      border: 1px solid #2b3446;
-      background: #0f141d;
-      color: #f1f5ff;
-      border-radius: 8px;
+    input {
+      border: 1px solid #2a3140;
+      border-radius: 7px;
       padding: 8px 10px;
-      font-size: 0.98rem;
+      font-size: 0.96rem;
+      background: #0f141d;
+      color: var(--text);
+    }
+    .status {
+      margin-top: 10px;
+      font-size: 0.84rem;
+      color: #9eb1da;
     }
     code {
-      background: #11151d;
-      border: 1px solid #2b3446;
-      padding: 2px 6px;
+      border: 1px solid #2b3345;
+      background: #111622;
       border-radius: 6px;
+      padding: 2px 6px;
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>AKSMED Logo Vector Preview</h1>
-    <p>Quick local preview for the extracted symbol vector from <code>logo.png</code> with editable text overlay.</p>
+    <h1>AKSMED Logo Preview (Latest Build)</h1>
+    <p>This page fetches the current SVG files with cache-busting so you always see newest renders.</p>
 
     <div class="actions">
       <a class="btn" href="logo-symbol.svg" download>Download Symbol SVG</a>
       <a class="btn" href="logo-editable.svg" download>Download Editable SVG</a>
-      <a class="btn" href="logo-vector.svg" download>Download SVG (Display)</a>
-      <a class="btn" href="logo-laser.svg" download>Download SVG (Laser)</a>
-      <a class="btn" href="logo-mask.png" download>Download PNG Mask</a>
+      <a class="btn" href="logo-laser.svg" download>Download Laser SVG</a>
+      <button id="refresh-btn" class="btn" type="button">Refresh Latest</button>
+      <label class="small"><input id="auto-refresh" type="checkbox" checked />Auto refresh (2s)</label>
     </div>
 
     <div class="grid">
       <section class="card">
         <h2>Original Photo</h2>
-        <div class="frame"><img src="logo.png" alt="Original logo photo" /></div>
+        <div class="frame dark"><img src="logo.png" alt="Original source photo" /></div>
       </section>
 
       <section class="card">
-        <h2>Extracted Mask</h2>
-        <div class="frame white"><img src="logo-mask.png" alt="Extracted logo mask" /></div>
+        <h2>Current Binary Mask</h2>
+        <div class="frame dark"><img id="mask-img" src="logo-mask.png" alt="Current extracted mask" /></div>
       </section>
 
       <section class="card">
-        <h2>Symbol Only (SVG)</h2>
-        <div class="frame white"><object data="logo-vector.svg" type="image/svg+xml"></object></div>
+        <h2>Latest Symbol SVG (No Cache)</h2>
+        <div id="symbol-preview" class="frame"></div>
       </section>
 
       <section class="card">
-        <h2>Editable Text (Normal Font)</h2>
-        <div class="editor-controls">
-          <label class="field">
-            <span>Line 1</span>
-            <input id="line1-input" type="text" value="AKSMED" />
-          </label>
-          <label class="field">
-            <span>Line 2</span>
-            <input id="line2-input" type="text" value="CLINIQUE" />
-          </label>
+        <h2>Editable Text SVG (No Cache)</h2>
+        <div class="editor">
+          <label>Line 1<input id="line1" type="text" value="AKSMED" /></label>
+          <label>Line 2<input id="line2" type="text" value="CLINIQUE" /></label>
         </div>
-        <div class="frame white"><object id="editable-svg" data="logo-editable.svg" type="image/svg+xml"></object></div>
+        <div id="editable-preview" class="frame"></div>
       </section>
     </div>
 
-    <div class="metrics" id="metrics"></div>
-
-    <section class="iter-wrap">
-      <div class="iter-head">Iteration Comparison (SVG vs target mask)</div>
-      <div class="iter-table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Rank</th>
-              <th>ID</th>
-              <th>Score</th>
-              <th>F1</th>
-              <th>IoU</th>
-              <th>Precision</th>
-              <th>Recall</th>
-              <th>Paths</th>
-              <th>Tolerance</th>
-              <th>Min Area</th>
-              <th>SVG</th>
-            </tr>
-          </thead>
-          <tbody id="iter-rows"></tbody>
-        </table>
-      </div>
-      <div class="iter-cards" id="iter-cards"></div>
-    </section>
-
-    <p class="note">To open: run <code>node server.js</code> in this folder, then visit <code>http://localhost:8080</code>.</p>
+    <div class="status" id="status">Loading latest assets...</div>
+    <p class="status">Server command: <code>node server.js</code> then open <code>http://localhost:8080</code>.</p>
   </div>
+
   <script>
-    function fmt(n) {
-      return typeof n === "number" ? n.toFixed(6).replace(/0+$/, "").replace(/\.$/, "") : n;
+    const state = { editableSvg: null, timer: null };
+
+    async function fetchTextNoCache(path) {
+      const v = Date.now();
+      const res = await fetch(`${path}?v=${v}`, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`${path} HTTP ${res.status}`);
+      return res.text();
     }
 
-    function metric(label, value) {
-      return `<div class="metric"><span class="k">${label}</span><span class="v">${value}</span></div>`;
+    function parseSvg(svgText) {
+      const doc = new DOMParser().parseFromString(svgText, 'image/svg+xml');
+      const svg = doc.documentElement;
+      svg.setAttribute('width', '100%');
+      svg.setAttribute('height', '100%');
+      svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+      return svg;
     }
 
-    async function loadIterations() {
-      const rowsEl = document.getElementById("iter-rows");
-      const cardsEl = document.getElementById("iter-cards");
-      const metricsEl = document.getElementById("metrics");
+    function applyEditableText() {
+      if (!state.editableSvg) return;
+      const l1 = document.getElementById('line1').value || ' ';
+      const l2 = document.getElementById('line2').value || ' ';
+      const t1 = state.editableSvg.querySelector('#line1');
+      const t2 = state.editableSvg.querySelector('#line2');
+      if (t1) t1.textContent = l1;
+      if (t2) t2.textContent = l2;
+    }
 
+    async function loadLatest() {
+      const status = document.getElementById('status');
       try {
-        const res = await fetch("iterations/vector-compare.json", { cache: "no-store" });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        const all = data.all || [];
-        const best = data.best || null;
+        const [symbolText, editableText] = await Promise.all([
+          fetchTextNoCache('logo-symbol.svg'),
+          fetchTextNoCache('logo-editable.svg')
+        ]);
 
-        if (!best || !all.length) throw new Error("Missing comparison data");
+        const symbolSvg = parseSvg(symbolText);
+        const editableSvg = parseSvg(editableText);
 
-        metricsEl.innerHTML = [
-          metric("Best Candidate", `#${best.id}`),
-          metric("Best Score", fmt(best.score)),
-          metric("Best F1", fmt(best.f1)),
-          metric("Best IoU", fmt(best.iou)),
-          metric("Precision", fmt(best.precision)),
-          metric("Recall", fmt(best.recall)),
-          metric("Paths", String(best.paths)),
-          metric("Candidates", String(data.candidate_count || all.length))
-        ].join("");
+        const symbolHost = document.getElementById('symbol-preview');
+        const editableHost = document.getElementById('editable-preview');
 
-        const sorted = [...all].sort((a, b) => b.score - a.score);
-        rowsEl.innerHTML = sorted.map((c, i) => `
-          <tr>
-            <td>${i + 1}</td>
-            <td>${c.id}</td>
-            <td>${fmt(c.score)}</td>
-            <td>${fmt(c.f1)}</td>
-            <td>${fmt(c.iou)}</td>
-            <td>${fmt(c.precision)}</td>
-            <td>${fmt(c.recall)}</td>
-            <td>${c.paths}</td>
-            <td>${c.tolerance}</td>
-            <td>${c.min_area}</td>
-            <td><a href="${c.svg}" download>download</a></td>
-          </tr>
-        `).join("");
+        symbolHost.replaceChildren(symbolHost.ownerDocument.importNode(symbolSvg, true));
+        state.editableSvg = editableHost.ownerDocument.importNode(editableSvg, true);
+        editableHost.replaceChildren(state.editableSvg);
 
-        cardsEl.innerHTML = sorted.slice(0, 6).map((c, i) => `
-          <article class="mini">
-            <div class="meta">
-              <strong>Rank ${i + 1} (ID ${c.id})</strong>
-              <span>F1 ${fmt(c.f1)}</span>
-            </div>
-            <div class="frame white">
-              <object data="${c.svg}" type="image/svg+xml"></object>
-            </div>
-          </article>
-        `).join("");
+        applyEditableText();
+
+        const mv = Date.now();
+        document.getElementById('mask-img').src = `logo-mask.png?v=${mv}`;
+        status.textContent = `Latest assets loaded: ${new Date().toLocaleTimeString()}`;
       } catch (err) {
-        rowsEl.innerHTML = `<tr><td colspan="11">Failed to load iteration data: ${err.message}</td></tr>`;
-        metricsEl.innerHTML = metric("Iteration Data", "Not loaded");
+        status.textContent = `Load error: ${err.message}`;
       }
     }
 
-    function initEditableTextPreview() {
-      const line1Input = document.getElementById("line1-input");
-      const line2Input = document.getElementById("line2-input");
-      const editableObj = document.getElementById("editable-svg");
-
-      function sync() {
-        const doc = editableObj.contentDocument;
-        if (!doc) return;
-        const line1 = doc.getElementById("line1");
-        const line2 = doc.getElementById("line2");
-        if (line1) line1.textContent = line1Input.value || " ";
-        if (line2) line2.textContent = line2Input.value || " ";
+    function setAutoRefresh(enabled) {
+      if (state.timer) {
+        clearInterval(state.timer);
+        state.timer = null;
       }
-
-      editableObj.addEventListener("load", sync);
-      line1Input.addEventListener("input", sync);
-      line2Input.addEventListener("input", sync);
-      sync();
+      if (enabled) {
+        state.timer = setInterval(loadLatest, 2000);
+      }
     }
 
-    loadIterations();
-    initEditableTextPreview();
+    document.getElementById('refresh-btn').addEventListener('click', loadLatest);
+    document.getElementById('auto-refresh').addEventListener('change', (e) => setAutoRefresh(e.target.checked));
+    document.getElementById('line1').addEventListener('input', applyEditableText);
+    document.getElementById('line2').addEventListener('input', applyEditableText);
+
+    setAutoRefresh(true);
+    loadLatest();
   </script>
 </body>
 </html>

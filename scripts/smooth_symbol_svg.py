@@ -3,8 +3,8 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image
-from scipy.ndimage import gaussian_filter, gaussian_filter1d
-from skimage import measure
+from scipy.ndimage import distance_transform_edt, gaussian_filter, gaussian_filter1d
+from skimage import measure, morphology
 
 ROOT = Path(__file__).resolve().parents[1]
 MASK_PATH = ROOT / "logo-mask.png"
@@ -18,6 +18,9 @@ MIN_AREA = 25
 HANDLE_CLAMP_RATIO = 0.42
 SHARP_CORNER_COS = 0.40
 SHARP_TENSION = 0.12
+THICKNESS_SCALE = 0.85
+THICKNESS_MIN = 2
+THICKNESS_MAX = 4
 
 
 def polygon_area(pts: np.ndarray) -> float:
@@ -88,7 +91,32 @@ def load_mask(path: Path) -> np.ndarray:
     return np.array(Image.open(path).convert("L")) > 127
 
 
+def normalize_line_thickness(mask: np.ndarray) -> np.ndarray:
+    # Convert varying-width glow traces to a stable-width binary shape:
+    # 1) centerline extraction, 2) fixed-radius redraw.
+    skel = morphology.skeletonize(mask)
+    dist = distance_transform_edt(mask)
+    widths = dist[skel]
+    if widths.size == 0:
+        return mask
+
+    half_w = int(
+        np.clip(
+            np.floor(float(np.median(widths)) * THICKNESS_SCALE),
+            THICKNESS_MIN,
+            THICKNESS_MAX,
+        )
+    )
+    normalized = morphology.binary_dilation(skel, morphology.disk(half_w))
+    normalized = morphology.binary_opening(normalized, morphology.disk(1))
+    normalized = morphology.binary_closing(normalized, morphology.disk(1))
+    normalized = morphology.remove_small_holes(normalized, area_threshold=24)
+    normalized = morphology.remove_small_objects(normalized, min_size=24)
+    return normalized
+
+
 def extract_smoothed_paths(mask: np.ndarray) -> list[str]:
+    mask = normalize_line_thickness(mask)
     h, w = mask.shape
     up = (
         Image.fromarray((mask.astype(np.uint8) * 255), mode="L")
