@@ -208,6 +208,12 @@
     <div class="actions">
       <button id="download-current-btn" class="btn" type="button">Download Current Editable</button>
       <button id="refresh-btn" class="btn" type="button">Refresh Latest</button>
+      <label class="color-control">Render Style
+        <select id="paint-mode">
+          <option value="solid" selected>Solid</option>
+          <option value="gold">Gold (Filtered)</option>
+        </select>
+      </label>
       <label class="color-control">Brand Color
         <input id="brand-color" type="color" value="#000000" />
         <span id="brand-color-val" class="color-chip">#000000</span>
@@ -311,7 +317,7 @@
 
           <label>Logo Scale (%)
             <div class="range-row">
-              <input id="h-logo-scale" type="range" min="40" max="180" step="1" value="40" />
+              <input id="h-logo-scale" type="range" min="20" max="180" step="1" value="40" />
               <output id="h-logo-scale-val">40%</output>
             </div>
           </label>
@@ -430,6 +436,206 @@
       return color.toLowerCase();
     }
 
+    function getPaintMode() {
+      return (q('paint-mode') && q('paint-mode').value) || 'solid';
+    }
+
+    function isGoldMode() {
+      return getPaintMode() === 'gold';
+    }
+
+    function syncPaintModeUI() {
+      const gold = isGoldMode();
+      const colorInput = q('brand-color');
+      const colorOut = q('brand-color-val');
+      if (colorInput) {
+        colorInput.disabled = gold;
+        colorInput.title = gold ? 'Disabled while gold style is enabled.' : '';
+        colorInput.style.opacity = gold ? '0.55' : '1';
+      }
+      if (colorOut) {
+        colorOut.textContent = gold ? 'GOLD' : getBrandColor().toUpperCase();
+      }
+    }
+
+    function ensureGoldDefs(svgRoot) {
+      if (!svgRoot) return;
+      const ns = 'http://www.w3.org/2000/svg';
+
+      let defs = svgRoot.querySelector('defs');
+      if (!defs) {
+        defs = document.createElementNS(ns, 'defs');
+        svgRoot.insertBefore(defs, svgRoot.firstChild);
+      }
+
+      if (!svgRoot.querySelector('#gold-fill-gradient')) {
+        const grad = document.createElementNS(ns, 'linearGradient');
+        grad.setAttribute('id', 'gold-fill-gradient');
+        grad.setAttribute('x1', '0%');
+        grad.setAttribute('y1', '0%');
+        grad.setAttribute('x2', '0%');
+        grad.setAttribute('y2', '100%');
+
+        const stops = [
+          { o: '0%', c: '#fff6cc' },
+          { o: '22%', c: '#f5d87a' },
+          { o: '47%', c: '#c99b2a' },
+          { o: '70%', c: '#b78313' },
+          { o: '100%', c: '#f8e6a0' }
+        ];
+        for (const s of stops) {
+          const stop = document.createElementNS(ns, 'stop');
+          stop.setAttribute('offset', s.o);
+          stop.setAttribute('stop-color', s.c);
+          grad.appendChild(stop);
+        }
+        defs.appendChild(grad);
+      }
+
+      if (!svgRoot.querySelector('#gold-stroke-gradient')) {
+        const grad = document.createElementNS(ns, 'linearGradient');
+        grad.setAttribute('id', 'gold-stroke-gradient');
+        grad.setAttribute('x1', '0%');
+        grad.setAttribute('y1', '0%');
+        grad.setAttribute('x2', '100%');
+        grad.setAttribute('y2', '100%');
+
+        const stops = [
+          { o: '0%', c: '#fff2b3' },
+          { o: '50%', c: '#d0a038' },
+          { o: '100%', c: '#8c6408' }
+        ];
+        for (const s of stops) {
+          const stop = document.createElementNS(ns, 'stop');
+          stop.setAttribute('offset', s.o);
+          stop.setAttribute('stop-color', s.c);
+          grad.appendChild(stop);
+        }
+        defs.appendChild(grad);
+      }
+
+      if (!svgRoot.querySelector('#gold-metal-filter')) {
+        const filter = document.createElementNS(ns, 'filter');
+        filter.setAttribute('id', 'gold-metal-filter');
+        filter.setAttribute('x', '-20%');
+        filter.setAttribute('y', '-20%');
+        filter.setAttribute('width', '140%');
+        filter.setAttribute('height', '140%');
+        filter.setAttribute('color-interpolation-filters', 'sRGB');
+
+        const shadow = document.createElementNS(ns, 'feDropShadow');
+        shadow.setAttribute('dx', '0.6');
+        shadow.setAttribute('dy', '0.8');
+        shadow.setAttribute('stdDeviation', '0.8');
+        shadow.setAttribute('flood-color', '#5a3f07');
+        shadow.setAttribute('flood-opacity', '0.45');
+        filter.appendChild(shadow);
+
+        const blur = document.createElementNS(ns, 'feGaussianBlur');
+        blur.setAttribute('in', 'SourceAlpha');
+        blur.setAttribute('stdDeviation', '0.6');
+        blur.setAttribute('result', 'gold-alpha');
+        filter.appendChild(blur);
+
+        const light = document.createElementNS(ns, 'feSpecularLighting');
+        light.setAttribute('in', 'gold-alpha');
+        light.setAttribute('surfaceScale', '2.2');
+        light.setAttribute('specularConstant', '0.5');
+        light.setAttribute('specularExponent', '28');
+        light.setAttribute('lighting-color', '#fff8d8');
+        light.setAttribute('result', 'gold-spec');
+        const point = document.createElementNS(ns, 'fePointLight');
+        point.setAttribute('x', '-220');
+        point.setAttribute('y', '-180');
+        point.setAttribute('z', '280');
+        light.appendChild(point);
+        filter.appendChild(light);
+
+        const comp = document.createElementNS(ns, 'feComposite');
+        comp.setAttribute('in', 'gold-spec');
+        comp.setAttribute('in2', 'SourceAlpha');
+        comp.setAttribute('operator', 'in');
+        comp.setAttribute('result', 'gold-spec-mask');
+        filter.appendChild(comp);
+
+        const merge = document.createElementNS(ns, 'feMerge');
+        const m1 = document.createElementNS(ns, 'feMergeNode');
+        m1.setAttribute('in', 'SourceGraphic');
+        merge.appendChild(m1);
+        const m2 = document.createElementNS(ns, 'feMergeNode');
+        m2.setAttribute('in', 'gold-spec-mask');
+        merge.appendChild(m2);
+        filter.appendChild(merge);
+
+        defs.appendChild(filter);
+      }
+    }
+
+    function applyPaintToNode(svgRoot, node, color) {
+      if (!node) return;
+      if (isGoldMode()) {
+        ensureGoldDefs(svgRoot);
+        recolorSvgNode(node, 'url(#gold-fill-gradient)');
+        node.setAttribute('filter', 'url(#gold-metal-filter)');
+        return;
+      }
+      recolorSvgNode(node, color);
+      node.removeAttribute('filter');
+    }
+
+    function applyPaintToText(svgRoot, textNode, color, strokeThicknessPct, strokeWidthPx) {
+      if (!textNode) return;
+      const gold = isGoldMode();
+      if (gold) {
+        ensureGoldDefs(svgRoot);
+      }
+      const fillPaint = gold ? 'url(#gold-fill-gradient)' : color;
+      const strokePaint = gold ? 'url(#gold-stroke-gradient)' : color;
+
+      textNode.setAttribute('fill', fillPaint);
+      if (strokeThicknessPct > 0) {
+        textNode.setAttribute('stroke', strokePaint);
+        textNode.setAttribute('stroke-width', String(strokeWidthPx));
+        textNode.setAttribute('paint-order', 'stroke fill');
+        textNode.setAttribute('stroke-linejoin', 'round');
+        textNode.setAttribute('stroke-linecap', 'round');
+      } else {
+        textNode.removeAttribute('stroke');
+        textNode.removeAttribute('stroke-width');
+        textNode.removeAttribute('paint-order');
+        textNode.removeAttribute('stroke-linejoin');
+        textNode.removeAttribute('stroke-linecap');
+      }
+
+      if (gold) {
+        textNode.setAttribute('filter', 'url(#gold-metal-filter)');
+      } else {
+        textNode.removeAttribute('filter');
+      }
+    }
+
+    function recolorSvgNode(node, color) {
+      if (!node) return;
+      const ownFill = node.getAttribute && node.getAttribute('fill');
+      if (ownFill && ownFill.toLowerCase() !== 'none') {
+        node.setAttribute('fill', color);
+      }
+      const filled = node.querySelectorAll ? node.querySelectorAll('[fill]') : [];
+      for (const el of filled) {
+        const fill = el.getAttribute('fill');
+        if (fill && fill.toLowerCase() !== 'none') {
+          el.setAttribute('fill', color);
+        }
+      }
+      const stroked = node.querySelectorAll ? node.querySelectorAll('[stroke]') : [];
+      for (const el of stroked) {
+        const stroke = el.getAttribute('stroke');
+        if (stroke && stroke.toLowerCase() !== 'none') {
+          el.setAttribute('stroke', color);
+        }
+      }
+    }
+
     function ensureGoogleFontLoaded(family) {
       if (!family || state.loadedGoogleFonts.has(family)) return;
       const id = `gf-${family.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
@@ -531,13 +737,14 @@
       const isSmallCaps = q('font-small-caps').checked;
       const strokeThicknessPct = parseFloat(q('stroke-thickness').value);
       const strokeWidthPx = (fontSize * strokeThicknessPct) / 100;
+      const gold = isGoldMode();
 
       setOutput('font-size-val', `${fontSize.toFixed(0)} px`);
       setOutput('letter-spacing-val', `${letterSpacing.toFixed(1)} px`);
       setOutput('line-spacing-val', `${lineSpacing.toFixed(2)}x`);
       setOutput('font-weight-val', `${fontWeight}`);
       setOutput('stroke-thickness-val', `${strokeThicknessPct.toFixed(2)}%`);
-      setOutput('brand-color-val', brandColor.toUpperCase());
+      setOutput('brand-color-val', gold ? 'GOLD' : brandColor.toUpperCase());
 
       const t1 = state.editableSvg.querySelector('#line1');
       const t2 = state.editableSvg.querySelector('#line2');
@@ -553,20 +760,7 @@
         t.setAttribute('font-weight', String(fontWeight));
         t.setAttribute('font-style', isItalic ? 'italic' : 'normal');
         t.setAttribute('font-variant', isSmallCaps ? 'small-caps' : 'normal');
-        t.setAttribute('fill', brandColor);
-        if (strokeThicknessPct > 0) {
-          t.setAttribute('stroke', brandColor);
-          t.setAttribute('stroke-width', String(strokeWidthPx));
-          t.setAttribute('paint-order', 'stroke fill');
-          t.setAttribute('stroke-linejoin', 'round');
-          t.setAttribute('stroke-linecap', 'round');
-        } else {
-          t.removeAttribute('stroke');
-          t.removeAttribute('stroke-width');
-          t.removeAttribute('paint-order');
-          t.removeAttribute('stroke-linejoin');
-          t.removeAttribute('stroke-linecap');
-        }
+        applyPaintToText(state.editableSvg, t, brandColor, strokeThicknessPct, strokeWidthPx);
       }
 
       t1.setAttribute('y', String(y1));
@@ -576,7 +770,7 @@
 
       const symbolGroup = state.editableSvg.querySelector('g');
       if (symbolGroup) {
-        symbolGroup.setAttribute('fill', brandColor);
+        applyPaintToNode(state.editableSvg, symbolGroup, brandColor);
       }
     }
 
@@ -601,6 +795,7 @@
       const gap = parseFloat(q('h-gap').value);
       const isItalic = q('h-font-italic').checked;
       const isSmallCaps = q('h-font-small-caps').checked;
+      const gold = isGoldMode();
 
       setOutput('h-font-size-val', `${fontSize.toFixed(0)} px`);
       setOutput('h-letter-spacing-val', `${letterSpacing.toFixed(1)} px`);
@@ -608,7 +803,7 @@
       setOutput('h-stroke-thickness-val', `${strokeThicknessPct.toFixed(2)}%`);
       setOutput('h-logo-scale-val', `${logoScalePct.toFixed(0)}%`);
       setOutput('h-gap-val', `${gap.toFixed(0)} px`);
-      setOutput('brand-color-val', brandColor.toUpperCase());
+      setOutput('brand-color-val', gold ? 'GOLD' : brandColor.toUpperCase());
 
       const base = state.symbolSvgTemplate;
       const vb = parseViewBox(base);
@@ -633,7 +828,7 @@
       for (const child of Array.from(base.children)) {
         symbolGroup.appendChild(child.cloneNode(true));
       }
-      symbolGroup.setAttribute('fill', brandColor);
+      applyPaintToNode(svg, symbolGroup, brandColor);
       svg.appendChild(symbolGroup);
 
       const textEl = document.createElementNS(ns, 'text');
@@ -646,14 +841,7 @@
       textEl.setAttribute('font-weight', String(fontWeight));
       textEl.setAttribute('font-style', isItalic ? 'italic' : 'normal');
       textEl.setAttribute('font-variant', isSmallCaps ? 'small-caps' : 'normal');
-      textEl.setAttribute('fill', brandColor);
-      if (strokeThicknessPct > 0) {
-        textEl.setAttribute('stroke', brandColor);
-        textEl.setAttribute('stroke-width', String(strokeWidthPx));
-        textEl.setAttribute('paint-order', 'stroke fill');
-        textEl.setAttribute('stroke-linejoin', 'round');
-        textEl.setAttribute('stroke-linecap', 'round');
-      }
+      applyPaintToText(svg, textEl, brandColor, strokeThicknessPct, strokeWidthPx);
       svg.appendChild(textEl);
 
       q('horizontal-preview').replaceChildren(svg);
@@ -723,11 +911,18 @@
     q('h-gap').addEventListener('input', applyHorizontalControls);
     q('h-font-italic').addEventListener('change', applyHorizontalControls);
     q('h-font-small-caps').addEventListener('change', applyHorizontalControls);
+    q('paint-mode').addEventListener('change', () => {
+      syncPaintModeUI();
+      applyControls();
+      applyHorizontalControls();
+    });
     q('brand-color').addEventListener('input', () => {
+      syncPaintModeUI();
       applyControls();
       applyHorizontalControls();
     });
 
+    syncPaintModeUI();
     loadLatest();
   </script>
 </body>
