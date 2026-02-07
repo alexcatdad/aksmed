@@ -8,363 +8,850 @@
   <meta http-equiv="Expires" content="0" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
-  <title>AKSMED Editable Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <title>AKSMED Logo Preview</title>
   <style>
     :root {
-      --bg: #101218;
-      --panel: #171b24;
-      --line: #2a3140;
-      --text: #edf2ff;
-      --muted: #b6bfd7;
-      --accent: #efd187;
+      --bg-void: #08090b;
+      --bg-base: #0c0d10;
+      --bg-card: #111318;
+      --bg-control: #16181e;
+      --bg-input: #0a0b0d;
+      --border-subtle: rgba(255,255,255,0.04);
+      --border-default: rgba(255,255,255,0.08);
+      --border-hover: rgba(255,255,255,0.12);
+      --gold: #c9a962;
+      --gold-dim: #a08550;
+      --gold-bright: #e4c878;
+      --gold-glow: rgba(201,169,98,0.15);
+      --text-primary: #edeef2;
+      --text-secondary: #9a9da8;
+      --text-muted: #5c5f6a;
+      --text-inverse: #0c0d10;
+      --font-ui: 'Instrument Sans', system-ui, sans-serif;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: ui-monospace, 'SF Mono', monospace;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
     }
-    * { box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
     body {
-      margin: 0;
-      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      color: var(--text);
-      background: radial-gradient(circle at 90% 10%, #20283a, var(--bg) 48%);
+      font-family: var(--font-ui);
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      background: var(--bg-base);
+      min-height: 100vh;
     }
-    .wrap {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
+
+    /* Subtle grid texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+      z-index: 0;
     }
-    h1 {
-      margin: 0 0 6px;
-      font-size: 1.5rem;
-    }
-    p {
-      margin: 0 0 14px;
-      color: var(--muted);
-    }
-    .actions {
+
+    .app { position: relative; z-index: 1; max-width: 1320px; margin: 0 auto; padding: 32px 40px 48px; }
+
+    /* Header */
+    .header {
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 14px;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border-subtle);
     }
-    .btn {
-      display: inline-block;
-      border: 1px solid #e0be67;
-      border-radius: 8px;
-      background: var(--accent);
-      color: #171717;
-      text-decoration: none;
-      font-weight: 700;
-      font-size: 0.92rem;
-      padding: 8px 12px;
+    .header-brand { display: flex; flex-direction: column; gap: 4px; }
+    .header-eyebrow {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold-dim);
+    }
+    .header-title {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      color: var(--text-primary);
+    }
+
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 14px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      margin-bottom: 28px;
+    }
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .toolbar-divider {
+      width: 1px;
+      height: 20px;
+      background: var(--border-default);
+    }
+    .toolbar-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .toolbar select {
+      appearance: none;
+      padding: 8px 32px 8px 12px;
+      font-family: var(--font-ui);
+      font-size: 13px;
+      color: var(--text-primary);
+      background: var(--bg-input);
+      border: 1px solid var(--border-default);
+      border-radius: 6px;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%235c5f6a' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      transition: border-color 0.15s var(--ease);
+    }
+    .toolbar select:hover { border-color: var(--border-hover); }
+    .toolbar select:focus { outline: none; border-color: var(--gold-dim); }
+    .toolbar input[type="color"] {
+      appearance: none;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 2px solid var(--border-default);
+      border-radius: 6px;
+      cursor: pointer;
+      background: transparent;
+      transition: border-color 0.15s var(--ease);
+    }
+    .toolbar input[type="color"]:hover { border-color: var(--border-hover); }
+    .toolbar input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
+    .toolbar input[type="color"]::-webkit-color-swatch { border: none; border-radius: 2px; }
+    .color-value {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+    .gold-slider { display: flex; align-items: center; gap: 8px; }
+    .gold-slider[hidden] { display: none; }
+    .gold-slider input[type="range"] {
+      width: 72px;
+      height: 3px;
+      appearance: none;
+      background: var(--border-default);
+      border-radius: 2px;
       cursor: pointer;
     }
-    .small {
-      font-size: 0.84rem;
-      color: var(--muted);
+    .gold-slider input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 12px;
+      height: 12px;
+      background: var(--gold);
+      border: 2px solid var(--bg-base);
+      border-radius: 50%;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+    .gold-slider .value {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--gold-dim);
+      min-width: 28px;
+    }
+
+    /* Version history controls */
+    .version-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: auto;
+    }
+    .version-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .version-nav button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      font-family: var(--font-ui);
+      font-size: 14px;
+      color: var(--text-secondary);
+      background: var(--bg-input);
+      border: 1px solid var(--border-default);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s var(--ease);
+    }
+    .version-nav button:hover:not(:disabled) {
+      color: var(--text-primary);
+      border-color: var(--border-hover);
+      background: var(--bg-control);
+    }
+    .version-nav button:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+    .version-nav button svg {
+      width: 14px;
+      height: 14px;
+    }
+    .version-indicator {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      min-width: 48px;
+      text-align: center;
+    }
+    .version-indicator.has-versions {
+      color: var(--gold-dim);
+    }
+    .btn-save-version {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 12px;
+      font-family: var(--font-ui);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(201,169,98,0.08);
+      border: 1px solid var(--gold-dim);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s var(--ease);
+    }
+    .btn-save-version:hover {
+      background: rgba(201,169,98,0.15);
+      border-color: var(--gold);
+    }
+    .btn-save-version svg {
+      width: 12px;
+      height: 12px;
+    }
+    .btn-clear-versions {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      color: var(--text-muted);
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s var(--ease);
+    }
+    .btn-clear-versions:hover {
+      color: #e57373;
+      border-color: rgba(229,115,115,0.3);
+      background: rgba(229,115,115,0.08);
+    }
+    .btn-clear-versions svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    /* Primary button */
+    .btn-primary {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      margin-left: 4px;
+      padding: 10px 18px;
+      font-family: var(--font-ui);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-inverse);
+      background: linear-gradient(180deg, var(--gold-bright) 0%, var(--gold) 100%);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2);
+      transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
     }
-    .color-control {
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px var(--gold-glow), inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+    .btn-primary:active { transform: translateY(0); }
+
+    /* Export button */
+    .btn-export {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      color: var(--muted);
-      font-size: 0.84rem;
-    }
-    .gold-control {
-      min-width: 210px;
-    }
-    .gold-control[hidden] {
-      display: none;
-    }
-    .gold-control input[type="range"] {
-      width: 140px;
-      margin: 0 2px;
-    }
-    .color-control input[type="color"] {
-      width: 34px;
-      height: 34px;
-      border: 1px solid #2a3140;
-      border-radius: 7px;
-      padding: 2px;
-      background: #0f141d;
+      gap: 6px;
+      padding: 8px 14px;
+      font-family: var(--font-ui);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: transparent;
+      border: 1px solid var(--gold-dim);
+      border-radius: 6px;
       cursor: pointer;
+      transition: all 0.15s var(--ease);
     }
-    .color-chip {
-      min-width: 78px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      color: #d8e3ff;
+    .btn-export:hover {
+      color: var(--text-inverse);
+      background: var(--gold);
+      border-color: var(--gold);
     }
+    .btn-export svg { width: 12px; height: 12px; }
+
+    /* Grid layout */
     .grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
     }
-    .card.full-width {
-      grid-column: 1 / -1;
-    }
+    .grid-full { grid-column: 1 / -1; }
+
+    /* Cards */
     .card {
-      background: linear-gradient(180deg, #1b2130, var(--panel));
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 10px;
-    }
-    .card h2 {
-      margin: 0 0 8px;
-      font-size: 1rem;
-    }
-    .frame {
-      border: 1px solid #2a3140;
-      border-radius: 9px;
-      width: 100%;
-      aspect-ratio: 1 / 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
       overflow: hidden;
+    }
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .card-title-group { display: flex; align-items: center; gap: 12px; }
+    .card-badge {
+      padding: 4px 10px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(201,169,98,0.1);
+      border-radius: 4px;
+    }
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 400;
+      color: var(--text-primary);
+      letter-spacing: 0.01em;
+    }
+    .card-body { padding: 20px; }
+
+    /* Preview frames */
+    .frame {
+      position: relative;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      aspect-ratio: 1 / 1;
       display: grid;
       place-items: center;
-      background: #fff;
     }
-    .frame.dark { background: #0c0f15; }
-    .frame.wide {
-      aspect-ratio: 22 / 6;
-      min-height: 280px;
-    }
-    .frame img,
-    .frame svg {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-    }
-    #editable-preview svg {
-      shape-rendering: geometricPrecision;
-      text-rendering: geometricPrecision;
-    }
-    .controls {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    label {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      font-size: 0.84rem;
-      color: var(--muted);
-    }
-    input:not([type="checkbox"]), select {
-      border: 1px solid #2a3140;
-      border-radius: 7px;
-      padding: 8px 10px;
-      font-size: 0.96rem;
-      background: #0f141d;
-      color: var(--text);
-    }
-    input[type="range"] {
-      padding: 0;
-      accent-color: var(--accent);
-    }
-    input[type="checkbox"] {
+    .frame.dark { background: var(--bg-void); }
+    .frame.wide { aspect-ratio: 3.5 / 1; min-height: 260px; }
+    .frame img, .frame svg { width: 100%; height: 100%; object-fit: contain; display: block; }
+    #editable-preview svg { shape-rendering: geometricPrecision; text-rendering: geometricPrecision; }
+
+    /* Frame corner marks (print aesthetic) */
+    .frame::before, .frame::after,
+    .frame-marks::before, .frame-marks::after {
+      content: '';
+      position: absolute;
       width: 16px;
       height: 16px;
-      accent-color: var(--accent);
-      margin: 0;
+      border: 1px solid rgba(0,0,0,0.15);
+      pointer-events: none;
     }
-    .toggle {
-      flex-direction: row;
+    .frame.dark::before, .frame.dark::after,
+    .frame.dark .frame-marks::before, .frame.dark .frame-marks::after {
+      border-color: rgba(255,255,255,0.1);
+    }
+    .frame::before { top: 12px; left: 12px; border-right: none; border-bottom: none; }
+    .frame::after { top: 12px; right: 12px; border-left: none; border-bottom: none; }
+    .frame-marks::before { bottom: 12px; left: 12px; border-right: none; border-top: none; }
+    .frame-marks::after { bottom: 12px; right: 12px; border-left: none; border-top: none; }
+
+    /* Controls panel */
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      padding: 16px;
+      background: var(--bg-control);
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .control-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .control-group input[type="text"],
+    .control-group select {
+      appearance: none;
+      width: 100%;
+      padding: 10px 12px;
+      font-family: var(--font-ui);
+      font-size: 13px;
+      color: var(--text-primary);
+      background: var(--bg-input);
+      border: 1px solid var(--border-default);
+      border-radius: 6px;
+      outline: none;
+      transition: border-color 0.15s var(--ease);
+    }
+    .control-group input[type="text"]:focus,
+    .control-group select:focus {
+      border-color: var(--gold-dim);
+    }
+    .control-group select {
+      padding-right: 32px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%235c5f6a' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+
+    /* Range sliders */
+    .range-control {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .range-control input[type="range"] {
+      flex: 1;
+      height: 3px;
+      appearance: none;
+      background: linear-gradient(90deg, var(--gold-dim) 0%, var(--border-default) 100%);
+      border-radius: 2px;
+      cursor: pointer;
+    }
+    .range-control input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      background: var(--gold);
+      border: 2px solid var(--bg-base);
+      border-radius: 50%;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+      transition: transform 0.1s var(--ease);
+    }
+    .range-control input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+    .range-control input[type="range"]::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      background: var(--gold);
+      border: 2px solid var(--bg-base);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .range-control output {
+      min-width: 48px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-align: right;
+      color: var(--gold-dim);
+    }
+
+    /* Checkboxes */
+    .toggle-control {
+      display: flex;
       align-items: center;
       gap: 8px;
-      padding-top: 4px;
-      color: #d5ddf2;
+      cursor: pointer;
+      color: var(--text-secondary);
+      font-size: 12px;
     }
-    .range-row {
+    .toggle-control input[type="checkbox"] {
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      background: var(--bg-input);
+      border: 1px solid var(--border-default);
+      border-radius: 4px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.15s var(--ease);
+    }
+    .toggle-control input[type="checkbox"]:checked {
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+    .toggle-control input[type="checkbox"]:checked::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 5px;
+      width: 4px;
+      height: 8px;
+      border: 2px solid var(--text-inverse);
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg);
+    }
+
+    /* Section divider */
+    .section-divider {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 8px 0;
+    }
+    .section-divider::before,
+    .section-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-default), transparent);
+    }
+    .section-divider span {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* Status bar */
+    .status {
+      margin-top: 24px;
+      padding: 12px 16px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .range-row output {
-      min-width: 60px;
-      text-align: right;
-      font-variant-numeric: tabular-nums;
-      color: #d8e3ff;
-      font-size: 0.82rem;
+    .status::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--gold);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
     }
-    .status {
-      margin-top: 10px;
-      font-size: 0.84rem;
-      color: #9eb1da;
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
     }
-    @media (max-width: 900px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-      .card.full-width {
-        grid-column: auto;
-      }
-      .frame.wide {
-        aspect-ratio: 16 / 7;
-        min-height: 220px;
-      }
+
+    /* Responsive */
+    @media (max-width: 960px) {
+      .app { padding: 24px; }
+      .grid { grid-template-columns: 1fr; }
+      .grid-full { grid-column: auto; }
+      .header { flex-direction: column; align-items: flex-start; }
+      .toolbar { flex-wrap: wrap; }
+    }
+    @media (max-width: 600px) {
+      .controls { grid-template-columns: 1fr 1fr; }
+      .toolbar-divider { display: none; }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>AKSMED Editable Logo Preview</h1>
-    <p>Only original image and editable text preview. This page always loads the latest SVG.</p>
+  <div class="app">
+    <header class="header">
+      <div class="header-brand">
+        <span class="header-eyebrow">Print Studio</span>
+        <h1 class="header-title">AKSMED Logo Lockups</h1>
+      </div>
+      <button id="refresh-btn" class="btn-primary" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 3v6h-6"/></svg>
+        Refresh
+      </button>
+    </header>
 
-    <div class="actions">
-      <button id="download-current-btn" class="btn" type="button">Download Current Editable</button>
-      <button id="refresh-btn" class="btn" type="button">Refresh Latest</button>
-      <label class="color-control">Render Style
+    <div class="toolbar">
+      <div class="toolbar-group">
+        <span class="toolbar-label">Style</span>
         <select id="paint-mode">
-          <option value="solid" selected>Solid</option>
-          <option value="gold">Gold (Filtered)</option>
+          <option value="solid">Solid Color</option>
+          <option value="gold" selected>Metallic Gold</option>
         </select>
-      </label>
-      <label id="gold-lightness-wrap" class="color-control gold-control" hidden>Gold Lightness
-        <input id="gold-lightness" type="range" min="0" max="100" step="1" value="62" />
-        <span id="gold-lightness-val" class="color-chip">62%</span>
-      </label>
-      <label id="gold-darkness-wrap" class="color-control gold-control" hidden>Gold Darkness
-        <input id="gold-darkness" type="range" min="0" max="100" step="1" value="38" />
-        <span id="gold-darkness-val" class="color-chip">38%</span>
-      </label>
-      <label class="color-control">Brand Color
+      </div>
+      <div id="gold-lightness-wrap" class="gold-slider">
+        <span class="toolbar-label">Shine</span>
+        <input id="gold-lightness" type="range" min="0" max="100" step="1" value="100" />
+        <span id="gold-lightness-val" class="value">100%</span>
+      </div>
+      <div id="gold-darkness-wrap" class="gold-slider">
+        <span class="toolbar-label">Depth</span>
+        <input id="gold-darkness" type="range" min="0" max="100" step="1" value="100" />
+        <span id="gold-darkness-val" class="value">100%</span>
+      </div>
+      <div class="toolbar-divider"></div>
+      <div class="toolbar-group">
+        <span class="toolbar-label">Brand</span>
         <input id="brand-color" type="color" value="#000000" />
-        <span id="brand-color-val" class="color-chip">#000000</span>
-      </label>
+        <span id="brand-color-val" class="color-value">#000000</span>
+      </div>
+      <div class="toolbar-divider"></div>
+      <div class="version-bar">
+        <span class="toolbar-label">Versions</span>
+        <div class="version-nav">
+          <button id="version-prev" type="button" title="Previous version" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <span id="version-indicator" class="version-indicator">0 / 0</span>
+          <button id="version-next" type="button" title="Next version" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+        <button id="version-save" class="btn-save-version" type="button" title="Save current state as version">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Save
+        </button>
+        <button id="version-clear" class="btn-clear-versions" type="button" title="Clear all versions">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+        </button>
+      </div>
     </div>
 
     <div class="grid">
       <section class="card">
-        <h2>Original Image</h2>
-        <div class="frame dark"><img src="logo.png" alt="Original source" /></div>
+        <div class="card-head">
+          <div class="card-title-group">
+            <span class="card-badge">Reference</span>
+            <h2 class="card-title">Original</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="frame dark">
+            <span class="frame-marks"></span>
+            <img src="logo.png" alt="Original source" />
+          </div>
+        </div>
       </section>
 
       <section class="card">
-        <h2>Editable Text</h2>
-        <div class="controls">
-          <label>Line 1<input id="line1" type="text" value="AKSMED" /></label>
-          <label>Line 2<input id="line2" type="text" value="CLINIQUE" /></label>
-
-          <label>Serif Font
-            <select id="font-picker"></select>
-          </label>
-
-          <label>Font Size
-            <div class="range-row">
-              <input id="font-size" type="range" min="48" max="180" step="1" value="109" />
-              <output id="font-size-val">109 px</output>
-            </div>
-          </label>
-
-          <label>Letter Spacing
-            <div class="range-row">
-              <input id="letter-spacing" type="range" min="-2" max="12" step="0.1" value="5" />
-              <output id="letter-spacing-val">5 px</output>
-            </div>
-          </label>
-
-          <label>Line Spacing
-            <div class="range-row">
-              <input id="line-spacing" type="range" min="0.7" max="1.6" step="0.01" value="0.92" />
-              <output id="line-spacing-val">0.92x</output>
-            </div>
-          </label>
-
-          <label>Font Weight (Thickness)
-            <div class="range-row">
-              <input id="font-weight" type="range" min="300" max="700" step="100" value="700" />
-              <output id="font-weight-val">700</output>
-            </div>
-          </label>
-
-          <label>Extra Stroke Thickness (% of Font Size)
-            <div class="range-row">
-              <input id="stroke-thickness" type="range" min="0" max="3" step="0.05" value="0.4" />
-              <output id="stroke-thickness-val">0.40%</output>
-            </div>
-          </label>
-
-          <label class="toggle"><input id="font-italic" type="checkbox" /> Italic</label>
-          <label class="toggle"><input id="font-small-caps" type="checkbox" /> Small Caps</label>
+        <div class="card-head">
+          <div class="card-title-group">
+            <span class="card-badge">Portrait</span>
+            <h2 class="card-title">Editable</h2>
+          </div>
+          <button id="download-portrait-btn" class="btn-export" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export
+          </button>
         </div>
-
-        <div id="editable-preview" class="frame"></div>
+        <div class="card-body">
+          <div class="controls">
+            <div class="control-group">
+              <span class="control-label">Line 1</span>
+              <input id="line1" type="text" value="AKSMED" />
+            </div>
+            <div class="control-group">
+              <span class="control-label">Line 2</span>
+              <input id="line2" type="text" value="CLINIQUE" />
+            </div>
+            <div class="control-group">
+              <span class="control-label">Typeface</span>
+              <select id="font-picker"></select>
+            </div>
+            <div class="control-group">
+              <span class="control-label">Line 1 Size</span>
+              <div class="range-control">
+                <input id="line1-size" type="range" min="48" max="220" step="1" value="196" />
+                <output id="line1-size-val">196</output>
+              </div>
+            </div>
+            <div class="control-group">
+              <span class="control-label">Line 2 Size</span>
+              <div class="range-control">
+                <input id="line2-size" type="range" min="48" max="220" step="1" value="116" />
+                <output id="line2-size-val">116</output>
+              </div>
+            </div>
+            <div class="control-group">
+              <span class="control-label">Line 1 Tracking</span>
+              <div class="range-control">
+                <input id="line1-letter-spacing" type="range" min="-2" max="80" step="0.5" value="25" />
+                <output id="line1-letter-spacing-val">25</output>
+              </div>
+            </div>
+            <div class="control-group">
+              <span class="control-label">Line 2 Tracking</span>
+              <div class="range-control">
+                <input id="line2-letter-spacing" type="range" min="-2" max="80" step="0.5" value="50" />
+                <output id="line2-letter-spacing-val">50</output>
+              </div>
+            </div>
+            <div class="control-group">
+              <span class="control-label">Leading</span>
+              <div class="range-control">
+                <input id="line-spacing" type="range" min="0.7" max="1.6" step="0.01" value="1" />
+                <output id="line-spacing-val">1.00</output>
+              </div>
+            </div>
+            <div class="control-group">
+              <span class="control-label">Weight</span>
+              <div class="range-control">
+                <input id="font-weight" type="range" min="300" max="700" step="100" value="700" />
+                <output id="font-weight-val">700</output>
+              </div>
+            </div>
+            <div class="control-group">
+              <span class="control-label">Stroke</span>
+              <div class="range-control">
+                <input id="stroke-thickness" type="range" min="0" max="3" step="0.05" value="0" />
+                <output id="stroke-thickness-val">0.00</output>
+              </div>
+            </div>
+            <div class="control-group">
+              <span class="control-label">Symbol Scale</span>
+              <div class="range-control">
+                <input id="logo-scale" type="range" min="20" max="180" step="1" value="69" />
+                <output id="logo-scale-val">69%</output>
+              </div>
+            </div>
+            <div class="control-group" style="flex-direction:row;gap:16px;align-items:center;">
+              <label class="toggle-control"><input id="font-italic" type="checkbox" /> Italic</label>
+              <label class="toggle-control"><input id="font-small-caps" type="checkbox" /> Small Caps</label>
+            </div>
+          </div>
+          <div id="editable-preview" class="frame">
+            <span class="frame-marks"></span>
+          </div>
+        </div>
       </section>
 
-      <section class="card full-width">
-        <h2>Horizontal Lockup (Logo Left, Text Right)</h2>
-        <div class="controls">
-          <label>One-Line Text<input id="h-text" type="text" value="AKSMED CLINIQUE" /></label>
+      <div class="section-divider"><span>Horizontal Lockup</span></div>
 
-          <label>Serif Font
-            <select id="h-font-picker"></select>
-          </label>
-
-          <label>Font Size
-            <div class="range-row">
-              <input id="h-font-size" type="range" min="48" max="180" step="1" value="180" />
-              <output id="h-font-size-val">180 px</output>
-            </div>
-          </label>
-
-          <label>Letter Spacing
-            <div class="range-row">
-              <input id="h-letter-spacing" type="range" min="-2" max="12" step="0.1" value="10" />
-              <output id="h-letter-spacing-val">10 px</output>
-            </div>
-          </label>
-
-          <label>Font Weight (Thickness)
-            <div class="range-row">
-              <input id="h-font-weight" type="range" min="300" max="700" step="100" value="700" />
-              <output id="h-font-weight-val">700</output>
-            </div>
-          </label>
-
-          <label>Extra Stroke Thickness (% of Font Size)
-            <div class="range-row">
-              <input id="h-stroke-thickness" type="range" min="0" max="3" step="0.05" value="0.4" />
-              <output id="h-stroke-thickness-val">0.40%</output>
-            </div>
-          </label>
-
-          <label>Logo Scale (%)
-            <div class="range-row">
-              <input id="h-logo-scale" type="range" min="20" max="180" step="1" value="40" />
-              <output id="h-logo-scale-val">40%</output>
-            </div>
-          </label>
-
-          <label>Gap (Logo to Text)
-            <div class="range-row">
-              <input id="h-gap" type="range" min="16" max="220" step="1" value="40" />
-              <output id="h-gap-val">40 px</output>
-            </div>
-          </label>
-
-          <label class="toggle"><input id="h-font-italic" type="checkbox" /> Italic</label>
-          <label class="toggle"><input id="h-font-small-caps" type="checkbox" /> Small Caps</label>
+      <section class="card grid-full">
+        <div class="card-head">
+          <div class="card-title-group">
+            <span class="card-badge">Landscape</span>
+            <h2 class="card-title">Symbol + Wordmark</h2>
+          </div>
+          <button id="download-landscape-btn" class="btn-export" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export
+          </button>
         </div>
-
-        <div id="horizontal-preview" class="frame wide"></div>
+        <div class="card-body">
+          <div class="controls">
+            <div class="control-group">
+              <span class="control-label">Wordmark</span>
+              <input id="h-text" type="text" value="AKSMED CLINIQUE" />
+            </div>
+            <div class="control-group">
+              <span class="control-label">Typeface</span>
+              <select id="h-font-picker"></select>
+            </div>
+            <div class="control-group">
+              <span class="control-label">Size</span>
+              <div class="range-control">
+                <input id="h-font-size" type="range" min="48" max="180" step="1" value="180" />
+                <output id="h-font-size-val">180</output>
+              </div>
+            </div>
+            <div class="control-group">
+              <span class="control-label">Tracking</span>
+              <div class="range-control">
+                <input id="h-letter-spacing" type="range" min="-2" max="12" step="0.1" value="10" />
+                <output id="h-letter-spacing-val">10</output>
+              </div>
+            </div>
+            <div class="control-group">
+              <span class="control-label">Weight</span>
+              <div class="range-control">
+                <input id="h-font-weight" type="range" min="300" max="700" step="100" value="700" />
+                <output id="h-font-weight-val">700</output>
+              </div>
+            </div>
+            <div class="control-group">
+              <span class="control-label">Stroke</span>
+              <div class="range-control">
+                <input id="h-stroke-thickness" type="range" min="0" max="3" step="0.05" value="0.4" />
+                <output id="h-stroke-thickness-val">0.40</output>
+              </div>
+            </div>
+            <div class="control-group">
+              <span class="control-label">Symbol Scale</span>
+              <div class="range-control">
+                <input id="h-logo-scale" type="range" min="20" max="180" step="1" value="40" />
+                <output id="h-logo-scale-val">40%</output>
+              </div>
+            </div>
+            <div class="control-group">
+              <span class="control-label">Gap</span>
+              <div class="range-control">
+                <input id="h-gap" type="range" min="16" max="220" step="1" value="40" />
+                <output id="h-gap-val">40</output>
+              </div>
+            </div>
+            <div class="control-group" style="flex-direction:row;gap:16px;align-items:center;">
+              <label class="toggle-control"><input id="h-font-italic" type="checkbox" /> Italic</label>
+              <label class="toggle-control"><input id="h-font-small-caps" type="checkbox" /> Small Caps</label>
+            </div>
+          </div>
+          <div id="horizontal-preview" class="frame wide">
+            <span class="frame-marks"></span>
+          </div>
+        </div>
       </section>
     </div>
 
-    <div class="status" id="status">Loading latest editable SVG...</div>
+    <div class="status" id="status">Initializing...</div>
   </div>
 
   <script>
     const DEFAULT_FONT_LABEL = 'Cormorant Garamond';
     const DEFAULT_VERTICAL_SETTINGS = {
-      letterSpacing: 5,
-      lineSpacing: 0.92,
-      strokeThickness: 0.4,
+      line1Size: 196,
+      line2Size: 116,
+      line1LetterSpacing: 25,
+      line2LetterSpacing: 50,
+      lineSpacing: 1,
+      strokeThickness: 0,
       fontWeight: 700,
+      logoScale: 69,
       italic: false,
       smallCaps: false
     };
@@ -434,28 +921,290 @@
     const state = {
       editableSvg: null,
       symbolSvgTemplate: null,
+      horizontalSvg: null,
       baseY1: null,
       baseY2: null,
-      baseSize: 109,
-      baseSpacing: 2,
+      symbolWrapper: null,
+      symbolCenterX: null,
+      symbolCenterY: null,
       loadedGoogleFonts: new Set(['Cormorant Garamond'])
     };
 
-    function q(id) {
-      return document.getElementById(id);
-    }
+    // ========== URL STATE PERSISTENCE ==========
+    const UrlState = (function() {
+      let debounceTimer = null;
+      const DEBOUNCE_DELAY_MS = 400;
 
-    function setOutput(id, value) {
-      q(id).textContent = value;
-    }
+      const CONTROLS = {
+        'line1': { type: 'text', default: 'AKSMED', param: 'l1' },
+        'line2': { type: 'text', default: 'CLINIQUE', param: 'l2' },
+        'font-picker': { type: 'select', default: 'Cormorant Garamond, Garamond, serif', param: 'f' },
+        'line1-size': { type: 'range', default: 196, param: 'l1s' },
+        'line2-size': { type: 'range', default: 116, param: 'l2s' },
+        'line1-letter-spacing': { type: 'range', default: 25, param: 'l1ls' },
+        'line2-letter-spacing': { type: 'range', default: 50, param: 'l2ls' },
+        'line-spacing': { type: 'range', default: 1, param: 'lns' },
+        'font-weight': { type: 'range', default: 700, param: 'fw' },
+        'stroke-thickness': { type: 'range', default: 0, param: 'st' },
+        'logo-scale': { type: 'range', default: 69, param: 'sc' },
+        'font-italic': { type: 'checkbox', default: false, param: 'it' },
+        'font-small-caps': { type: 'checkbox', default: false, param: 'smc' },
+        'h-text': { type: 'text', default: 'AKSMED CLINIQUE', param: 'ht' },
+        'h-font-picker': { type: 'select', default: 'Cormorant Garamond, Garamond, serif', param: 'hf' },
+        'h-font-size': { type: 'range', default: 180, param: 'hfs' },
+        'h-letter-spacing': { type: 'range', default: 10, param: 'hls' },
+        'h-font-weight': { type: 'range', default: 700, param: 'hfw' },
+        'h-stroke-thickness': { type: 'range', default: 0.4, param: 'hst' },
+        'h-logo-scale': { type: 'range', default: 40, param: 'hsc' },
+        'h-gap': { type: 'range', default: 40, param: 'hg' },
+        'h-font-italic': { type: 'checkbox', default: false, param: 'hit' },
+        'h-font-small-caps': { type: 'checkbox', default: false, param: 'hsmc' },
+        'paint-mode': { type: 'select', default: 'gold', param: 'pm' },
+        'gold-lightness': { type: 'range', default: 100, param: 'gl' },
+        'gold-darkness': { type: 'range', default: 100, param: 'gd' },
+        'brand-color': { type: 'color', default: '#000000', param: 'bc' }
+      };
+
+      const PARAM_TO_CONTROL = {};
+      for (const [id, cfg] of Object.entries(CONTROLS)) {
+        PARAM_TO_CONTROL[cfg.param] = id;
+      }
+
+      function getVal(id) {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        const cfg = CONTROLS[id];
+        if (!cfg) return null;
+        if (cfg.type === 'checkbox') return el.checked;
+        if (cfg.type === 'range') return parseFloat(el.value);
+        return el.value;
+      }
+
+      function setVal(id, value) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const cfg = CONTROLS[id];
+        if (!cfg) return;
+        if (cfg.type === 'checkbox') {
+          el.checked = value === true || value === 'true' || value === '1';
+        } else {
+          el.value = value;
+        }
+      }
+
+      function isDiff(id, value) {
+        const cfg = CONTROLS[id];
+        if (!cfg) return true;
+        if (cfg.type === 'range') return Math.abs(value - cfg.default) > 0.001;
+        if (cfg.type === 'checkbox') return value !== cfg.default;
+        return value !== cfg.default;
+      }
+
+      function serialize(id, value) {
+        const cfg = CONTROLS[id];
+        if (cfg.type === 'checkbox') return value ? '1' : null;
+        if (cfg.type === 'color') return value.replace(/^#/, '');
+        return String(value);
+      }
+
+      function deserialize(id, urlVal) {
+        const cfg = CONTROLS[id];
+        if (cfg.type === 'checkbox') return urlVal === '1' || urlVal === 'true';
+        if (cfg.type === 'range') return parseFloat(urlVal);
+        if (cfg.type === 'color') return urlVal.startsWith('#') ? urlVal : `#${urlVal}`;
+        return urlVal;
+      }
+
+      function saveStateToUrl() {
+        const params = new URLSearchParams();
+        for (const [id, cfg] of Object.entries(CONTROLS)) {
+          const value = getVal(id);
+          if (value === null) continue;
+          if (isDiff(id, value)) {
+            const s = serialize(id, value);
+            if (s !== null) params.set(cfg.param, s);
+          }
+        }
+        const str = params.toString();
+        const newUrl = str ? `${window.location.pathname}?${str}` : window.location.pathname;
+        window.history.replaceState(null, '', newUrl);
+      }
+
+      function saveDebounced() {
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => { saveStateToUrl(); debounceTimer = null; }, DEBOUNCE_DELAY_MS);
+      }
+
+      function loadStateFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        // Legacy migration for old single letter-spacing param
+        const legacyLs = params.get('ls');
+        if (legacyLs !== null && !params.has('l1ls') && !params.has('l2ls')) {
+          params.set('l1ls', legacyLs);
+          params.set('l2ls', legacyLs);
+        }
+        for (const [id, cfg] of Object.entries(CONTROLS)) {
+          setVal(id, cfg.default);
+        }
+        for (const [param, urlVal] of params.entries()) {
+          const id = PARAM_TO_CONTROL[param];
+          if (!id) continue;
+          setVal(id, deserialize(id, urlVal));
+        }
+      }
+
+      function attachListeners() {
+        for (const [id, cfg] of Object.entries(CONTROLS)) {
+          const el = document.getElementById(id);
+          if (!el) continue;
+          const evt = (cfg.type === 'range' || cfg.type === 'text') ? 'input' : 'change';
+          el.addEventListener(evt, saveDebounced);
+        }
+      }
+
+      function init() {
+        loadStateFromUrl();
+        attachListeners();
+      }
+
+      return { init, saveStateToUrl, loadStateFromUrl, getVal, setVal, CONTROLS };
+    })();
+
+    // ========== VERSION HISTORY ==========
+    const VersionHistory = (function() {
+      const STORAGE_KEY = 'aksmed-versions';
+      let versions = [];
+      let currentIndex = -1; // -1 means "live" (not viewing a saved version)
+
+      function load() {
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (stored) {
+            versions = JSON.parse(stored);
+            if (!Array.isArray(versions)) versions = [];
+          }
+        } catch (e) {
+          versions = [];
+        }
+      }
+
+      function save() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(versions));
+        } catch (e) {
+          console.warn('Failed to save versions to localStorage', e);
+        }
+      }
+
+      function getCurrentParams() {
+        const params = {};
+        for (const [id, cfg] of Object.entries(UrlState.CONTROLS)) {
+          params[cfg.param] = UrlState.getVal(id);
+        }
+        return params;
+      }
+
+      function applyParams(params) {
+        for (const [id, cfg] of Object.entries(UrlState.CONTROLS)) {
+          if (params.hasOwnProperty(cfg.param)) {
+            UrlState.setVal(id, params[cfg.param]);
+          }
+        }
+      }
+
+      function saveVersion() {
+        const params = getCurrentParams();
+        const version = {
+          params,
+          timestamp: Date.now(),
+          label: `v${versions.length + 1}`
+        };
+        versions.push(version);
+        currentIndex = versions.length - 1;
+        save();
+        updateUI();
+        UrlState.saveStateToUrl();
+      }
+
+      function goToVersion(index) {
+        if (index < 0 || index >= versions.length) return;
+        currentIndex = index;
+        applyParams(versions[index].params);
+        updateUI();
+        UrlState.saveStateToUrl();
+        // Trigger re-render
+        if (typeof applyControls === 'function') applyControls();
+        if (typeof applyHorizontalControls === 'function') applyHorizontalControls();
+        if (typeof syncPaintModeUI === 'function') syncPaintModeUI();
+      }
+
+      function goPrev() {
+        if (currentIndex > 0) {
+          goToVersion(currentIndex - 1);
+        } else if (currentIndex === -1 && versions.length > 0) {
+          goToVersion(versions.length - 1);
+        }
+      }
+
+      function goNext() {
+        if (currentIndex >= 0 && currentIndex < versions.length - 1) {
+          goToVersion(currentIndex + 1);
+        }
+      }
+
+      function clearAll() {
+        if (versions.length === 0) return;
+        if (!confirm(`Clear all ${versions.length} saved versions?`)) return;
+        versions = [];
+        currentIndex = -1;
+        save();
+        updateUI();
+      }
+
+      function updateUI() {
+        const prevBtn = document.getElementById('version-prev');
+        const nextBtn = document.getElementById('version-next');
+        const indicator = document.getElementById('version-indicator');
+
+        const total = versions.length;
+        const displayIndex = currentIndex >= 0 ? currentIndex + 1 : total;
+
+        if (indicator) {
+          indicator.textContent = total > 0 ? `${displayIndex} / ${total}` : '0 / 0';
+          indicator.classList.toggle('has-versions', total > 0);
+        }
+
+        if (prevBtn) {
+          prevBtn.disabled = currentIndex <= 0 && !(currentIndex === -1 && total > 0);
+        }
+        if (nextBtn) {
+          nextBtn.disabled = currentIndex === -1 || currentIndex >= total - 1;
+        }
+      }
+
+      function init() {
+        load();
+        currentIndex = versions.length > 0 ? versions.length - 1 : -1;
+        updateUI();
+
+        document.getElementById('version-save')?.addEventListener('click', saveVersion);
+        document.getElementById('version-prev')?.addEventListener('click', goPrev);
+        document.getElementById('version-next')?.addEventListener('click', goNext);
+        document.getElementById('version-clear')?.addEventListener('click', clearAll);
+      }
+
+      return { init, saveVersion, goPrev, goNext, clearAll, updateUI };
+    })();
+
+    function q(id) { return document.getElementById(id); }
+    function setOutput(id, value) { const el = q(id); if (el) el.textContent = value; }
 
     function getBrandColor() {
-      const color = (q('brand-color') && q('brand-color').value) || '#000000';
-      return color.toLowerCase();
+      return (q('brand-color')?.value || '#000000').toLowerCase();
     }
 
     function getPaintMode() {
-      return (q('paint-mode') && q('paint-mode').value) || 'solid';
+      return q('paint-mode')?.value || 'solid';
     }
 
     function isGoldMode() {
@@ -466,33 +1215,9 @@
       return Math.max(min, Math.min(max, v));
     }
 
-    function toHex(n) {
-      const s = Math.round(clamp(n, 0, 255)).toString(16);
-      return s.length === 1 ? `0${s}` : s;
-    }
-
-    function hslToHex(h, s, l) {
-      const hh = ((h % 360) + 360) % 360;
-      const ss = clamp(s, 0, 100) / 100;
-      const ll = clamp(l, 0, 100) / 100;
-      const c = (1 - Math.abs(2 * ll - 1)) * ss;
-      const x = c * (1 - Math.abs(((hh / 60) % 2) - 1));
-      const m = ll - c / 2;
-      let r = 0;
-      let g = 0;
-      let b = 0;
-      if (hh < 60) [r, g, b] = [c, x, 0];
-      else if (hh < 120) [r, g, b] = [x, c, 0];
-      else if (hh < 180) [r, g, b] = [0, c, x];
-      else if (hh < 240) [r, g, b] = [0, x, c];
-      else if (hh < 300) [r, g, b] = [x, 0, c];
-      else [r, g, b] = [c, 0, x];
-      return `#${toHex((r + m) * 255)}${toHex((g + m) * 255)}${toHex((b + m) * 255)}`;
-    }
-
     function getGoldTuning() {
-      const lightRaw = parseFloat((q('gold-lightness') && q('gold-lightness').value) || '62');
-      const darkRaw = parseFloat((q('gold-darkness') && q('gold-darkness').value) || '38');
+      const lightRaw = parseFloat(q('gold-lightness')?.value || '62');
+      const darkRaw = parseFloat(q('gold-darkness')?.value || '38');
       return {
         lightness: clamp(lightRaw, 0, 100),
         darkness: clamp(darkRaw, 0, 100)
@@ -522,6 +1247,7 @@
       }
     }
 
+    // ========== REALISTIC METALLIC GOLD FILTER ==========
     function ensureGoldDefs(svgRoot) {
       if (!svgRoot) return;
       const ns = 'http://www.w3.org/2000/svg';
@@ -533,105 +1259,164 @@
         svgRoot.insertBefore(defs, svgRoot.firstChild);
       }
 
-      const baseLight = 35 + tuning.lightness * 0.55;
-      const baseDark = 5 + tuning.darkness * 0.55;
-      const topL = clamp(baseLight + 10, 46, 96);
-      const hiL = clamp(baseLight, 35, 90);
-      const midL = clamp((baseLight + baseDark) / 2, 18, 80);
-      const lowL = clamp(baseDark, 6, 62);
-      const edgeL = clamp(baseDark + 8, 10, 70);
-
-      defs.querySelector('#gold-fill-gradient')?.remove();
-      const fillGrad = document.createElementNS(ns, 'linearGradient');
-      fillGrad.setAttribute('id', 'gold-fill-gradient');
-      fillGrad.setAttribute('x1', '0%');
-      fillGrad.setAttribute('y1', '0%');
-      fillGrad.setAttribute('x2', '0%');
-      fillGrad.setAttribute('y2', '100%');
-      [
-        { o: '0%', c: hslToHex(46, 82, topL) },
-        { o: '22%', c: hslToHex(45, 78, hiL) },
-        { o: '48%', c: hslToHex(42, 70, midL) },
-        { o: '72%', c: hslToHex(39, 72, lowL) },
-        { o: '100%', c: hslToHex(46, 76, edgeL) }
-      ].forEach((s) => {
-        const stop = document.createElementNS(ns, 'stop');
-        stop.setAttribute('offset', s.o);
-        stop.setAttribute('stop-color', s.c);
-        fillGrad.appendChild(stop);
-      });
-      defs.appendChild(fillGrad);
-
-      defs.querySelector('#gold-stroke-gradient')?.remove();
-      const strokeGrad = document.createElementNS(ns, 'linearGradient');
-      strokeGrad.setAttribute('id', 'gold-stroke-gradient');
-      strokeGrad.setAttribute('x1', '0%');
-      strokeGrad.setAttribute('y1', '0%');
-      strokeGrad.setAttribute('x2', '100%');
-      strokeGrad.setAttribute('y2', '100%');
-      [
-        { o: '0%', c: hslToHex(47, 76, clamp(topL - 6, 30, 94)) },
-        { o: '50%', c: hslToHex(42, 68, clamp(midL - 4, 12, 82)) },
-        { o: '100%', c: hslToHex(37, 74, clamp(lowL - 8, 4, 56)) }
-      ].forEach((s) => {
-        const stop = document.createElementNS(ns, 'stop');
-        stop.setAttribute('offset', s.o);
-        stop.setAttribute('stop-color', s.c);
-        strokeGrad.appendChild(stop);
-      });
-      defs.appendChild(strokeGrad);
-
-      const contrast = clamp((tuning.lightness - tuning.darkness + 100) / 200, 0.2, 0.95);
+      // Remove existing gold filter
       defs.querySelector('#gold-metal-filter')?.remove();
+
+      // Calculate tuning parameters
+      const shine = tuning.lightness / 100;
+      const depth = tuning.darkness / 100;
+      const surfaceScale = 2.5 + shine * 3.5;
+      const specConstant = 0.5 + shine * 0.6;
+      const specExponent = 25 + shine * 35;
+      const diffuseConstant = 0.6 + depth * 0.4;
+
       const filter = document.createElementNS(ns, 'filter');
       filter.setAttribute('id', 'gold-metal-filter');
-      filter.setAttribute('x', '-24%');
-      filter.setAttribute('y', '-24%');
-      filter.setAttribute('width', '148%');
-      filter.setAttribute('height', '148%');
+      filter.setAttribute('x', '-20%');
+      filter.setAttribute('y', '-20%');
+      filter.setAttribute('width', '140%');
+      filter.setAttribute('height', '140%');
       filter.setAttribute('color-interpolation-filters', 'sRGB');
 
-      const shadow = document.createElementNS(ns, 'feDropShadow');
-      shadow.setAttribute('dx', '0.8');
-      shadow.setAttribute('dy', '1.0');
-      shadow.setAttribute('stdDeviation', '0.9');
-      shadow.setAttribute('flood-color', hslToHex(34, 68, clamp(8 + tuning.darkness * 0.22, 8, 30)));
-      shadow.setAttribute('flood-opacity', String((0.22 + tuning.darkness * 0.004).toFixed(2)));
-      filter.appendChild(shadow);
+      // Gold base color transformation
+      const colorMatrix = document.createElementNS(ns, 'feColorMatrix');
+      colorMatrix.setAttribute('in', 'SourceGraphic');
+      colorMatrix.setAttribute('type', 'matrix');
+      colorMatrix.setAttribute('values', `
+        1.2  0.1  0    0  0.05
+        0.95 0.8  0.1  0  0.02
+        0.2  0.3  0.2  0  0
+        0    0    0    1  0
+      `);
+      colorMatrix.setAttribute('result', 'goldBase');
+      filter.appendChild(colorMatrix);
 
+      // Blur for lighting calculations
       const blur = document.createElementNS(ns, 'feGaussianBlur');
       blur.setAttribute('in', 'SourceAlpha');
-      blur.setAttribute('stdDeviation', '0.72');
-      blur.setAttribute('result', 'gold-alpha');
+      blur.setAttribute('stdDeviation', '2');
+      blur.setAttribute('result', 'blur');
       filter.appendChild(blur);
 
-      const light = document.createElementNS(ns, 'feSpecularLighting');
-      light.setAttribute('in', 'gold-alpha');
-      light.setAttribute('surfaceScale', String((1.5 + contrast * 2.6).toFixed(2)));
-      light.setAttribute('specularConstant', String((0.30 + contrast * 0.52).toFixed(2)));
-      light.setAttribute('specularExponent', String(Math.round(20 + contrast * 24)));
-      light.setAttribute('lighting-color', hslToHex(50, 86, clamp(88 + tuning.lightness * 0.07, 86, 96)));
-      light.setAttribute('result', 'gold-spec');
-      const point = document.createElementNS(ns, 'fePointLight');
-      point.setAttribute('x', '-220');
-      point.setAttribute('y', '-190');
-      point.setAttribute('z', String(Math.round(220 + tuning.lightness * 1.3)));
-      light.appendChild(point);
-      filter.appendChild(light);
+      // Primary specular highlight (top-left light)
+      const spec1 = document.createElementNS(ns, 'feSpecularLighting');
+      spec1.setAttribute('in', 'blur');
+      spec1.setAttribute('surfaceScale', String(surfaceScale));
+      spec1.setAttribute('specularConstant', String(specConstant));
+      spec1.setAttribute('specularExponent', String(Math.round(specExponent)));
+      spec1.setAttribute('lighting-color', '#FFFEF0');
+      spec1.setAttribute('result', 'spec1');
+      const light1 = document.createElementNS(ns, 'feDistantLight');
+      light1.setAttribute('azimuth', '225');
+      light1.setAttribute('elevation', '55');
+      spec1.appendChild(light1);
+      filter.appendChild(spec1);
 
-      const comp = document.createElementNS(ns, 'feComposite');
-      comp.setAttribute('in', 'gold-spec');
-      comp.setAttribute('in2', 'SourceAlpha');
-      comp.setAttribute('operator', 'in');
-      comp.setAttribute('result', 'gold-spec-mask');
-      filter.appendChild(comp);
+      // Secondary specular (fill light from opposite side)
+      const spec2 = document.createElementNS(ns, 'feSpecularLighting');
+      spec2.setAttribute('in', 'blur');
+      spec2.setAttribute('surfaceScale', String(surfaceScale * 0.5));
+      spec2.setAttribute('specularConstant', String(specConstant * 0.5));
+      spec2.setAttribute('specularExponent', String(Math.round(specExponent * 1.5)));
+      spec2.setAttribute('lighting-color', '#FFE4B5');
+      spec2.setAttribute('result', 'spec2');
+      const light2 = document.createElementNS(ns, 'feDistantLight');
+      light2.setAttribute('azimuth', '45');
+      light2.setAttribute('elevation', '35');
+      spec2.appendChild(light2);
+      filter.appendChild(spec2);
 
+      // Diffuse lighting for body color
+      const diffuse = document.createElementNS(ns, 'feDiffuseLighting');
+      diffuse.setAttribute('in', 'blur');
+      diffuse.setAttribute('surfaceScale', String(surfaceScale * 0.8));
+      diffuse.setAttribute('diffuseConstant', String(diffuseConstant));
+      diffuse.setAttribute('lighting-color', '#DAA520');
+      diffuse.setAttribute('result', 'diffuse');
+      const light3 = document.createElementNS(ns, 'feDistantLight');
+      light3.setAttribute('azimuth', '135');
+      light3.setAttribute('elevation', '45');
+      diffuse.appendChild(light3);
+      filter.appendChild(diffuse);
+
+      // Combine diffuse with gold base
+      const comp1 = document.createElementNS(ns, 'feComposite');
+      comp1.setAttribute('in', 'diffuse');
+      comp1.setAttribute('in2', 'goldBase');
+      comp1.setAttribute('operator', 'arithmetic');
+      comp1.setAttribute('k1', '0.3');
+      comp1.setAttribute('k2', '0.6');
+      comp1.setAttribute('k3', '0.4');
+      comp1.setAttribute('k4', '0');
+      comp1.setAttribute('result', 'lit');
+      filter.appendChild(comp1);
+
+      // Add primary specular
+      const comp2 = document.createElementNS(ns, 'feComposite');
+      comp2.setAttribute('in', 'spec1');
+      comp2.setAttribute('in2', 'lit');
+      comp2.setAttribute('operator', 'arithmetic');
+      comp2.setAttribute('k1', '0');
+      comp2.setAttribute('k2', '1');
+      comp2.setAttribute('k3', String(0.4 + shine * 0.3));
+      comp2.setAttribute('k4', '0');
+      comp2.setAttribute('result', 'shiny1');
+      filter.appendChild(comp2);
+
+      // Add secondary specular
+      const comp3 = document.createElementNS(ns, 'feComposite');
+      comp3.setAttribute('in', 'spec2');
+      comp3.setAttribute('in2', 'shiny1');
+      comp3.setAttribute('operator', 'arithmetic');
+      comp3.setAttribute('k1', '0');
+      comp3.setAttribute('k2', '1');
+      comp3.setAttribute('k3', '0.25');
+      comp3.setAttribute('k4', '0');
+      comp3.setAttribute('result', 'shiny2');
+      filter.appendChild(comp3);
+
+      // Clip to original shape
+      const clip = document.createElementNS(ns, 'feComposite');
+      clip.setAttribute('in', 'shiny2');
+      clip.setAttribute('in2', 'SourceAlpha');
+      clip.setAttribute('operator', 'in');
+      clip.setAttribute('result', 'clipped');
+      filter.appendChild(clip);
+
+      // Subtle drop shadow for depth
+      const shadowBlur = document.createElementNS(ns, 'feGaussianBlur');
+      shadowBlur.setAttribute('in', 'SourceAlpha');
+      shadowBlur.setAttribute('stdDeviation', '1.5');
+      shadowBlur.setAttribute('result', 'shadowBlur');
+      filter.appendChild(shadowBlur);
+
+      const shadowOffset = document.createElementNS(ns, 'feOffset');
+      shadowOffset.setAttribute('in', 'shadowBlur');
+      shadowOffset.setAttribute('dx', '0.5');
+      shadowOffset.setAttribute('dy', '1');
+      shadowOffset.setAttribute('result', 'shadowOffset');
+      filter.appendChild(shadowOffset);
+
+      const shadowColor = document.createElementNS(ns, 'feFlood');
+      shadowColor.setAttribute('flood-color', '#3D2E00');
+      shadowColor.setAttribute('flood-opacity', String(0.15 + depth * 0.2));
+      shadowColor.setAttribute('result', 'shadowColor');
+      filter.appendChild(shadowColor);
+
+      const shadowComp = document.createElementNS(ns, 'feComposite');
+      shadowComp.setAttribute('in', 'shadowColor');
+      shadowComp.setAttribute('in2', 'shadowOffset');
+      shadowComp.setAttribute('operator', 'in');
+      shadowComp.setAttribute('result', 'shadow');
+      filter.appendChild(shadowComp);
+
+      // Final merge
       const merge = document.createElementNS(ns, 'feMerge');
       const m1 = document.createElementNS(ns, 'feMergeNode');
-      m1.setAttribute('in', 'SourceGraphic');
+      m1.setAttribute('in', 'shadow');
       merge.appendChild(m1);
       const m2 = document.createElementNS(ns, 'feMergeNode');
-      m2.setAttribute('in', 'gold-spec-mask');
+      m2.setAttribute('in', 'clipped');
       merge.appendChild(m2);
       filter.appendChild(merge);
 
@@ -642,7 +1427,7 @@
       if (!node) return;
       if (isGoldMode()) {
         ensureGoldDefs(svgRoot);
-        recolorSvgNode(node, 'url(#gold-fill-gradient)');
+        recolorSvgNode(node, '#B8860B');
         node.setAttribute('filter', 'url(#gold-metal-filter)');
         return;
       }
@@ -656,8 +1441,8 @@
       if (gold) {
         ensureGoldDefs(svgRoot);
       }
-      const fillPaint = gold ? 'url(#gold-fill-gradient)' : color;
-      const strokePaint = gold ? 'url(#gold-stroke-gradient)' : color;
+      const fillPaint = gold ? '#B8860B' : color;
+      const strokePaint = gold ? '#8B6914' : color;
 
       textNode.setAttribute('fill', fillPaint);
       if (strokeThicknessPct > 0) {
@@ -683,18 +1468,18 @@
 
     function recolorSvgNode(node, color) {
       if (!node) return;
-      const ownFill = node.getAttribute && node.getAttribute('fill');
+      const ownFill = node.getAttribute?.('fill');
       if (ownFill && ownFill.toLowerCase() !== 'none') {
         node.setAttribute('fill', color);
       }
-      const filled = node.querySelectorAll ? node.querySelectorAll('[fill]') : [];
+      const filled = node.querySelectorAll?.('[fill]') || [];
       for (const el of filled) {
         const fill = el.getAttribute('fill');
         if (fill && fill.toLowerCase() !== 'none') {
           el.setAttribute('fill', color);
         }
       }
-      const stroked = node.querySelectorAll ? node.querySelectorAll('[stroke]') : [];
+      const stroked = node.querySelectorAll?.('[stroke]') || [];
       for (const el of stroked) {
         const stroke = el.getAttribute('stroke');
         if (stroke && stroke.toLowerCase() !== 'none') {
@@ -761,6 +1546,35 @@
       return svg;
     }
 
+    function ensurePortraitSymbolWrapper() {
+      if (!state.editableSvg) return null;
+      if (state.symbolWrapper?.isConnected) return state.symbolWrapper;
+
+      const ns = 'http://www.w3.org/2000/svg';
+      const svg = state.editableSvg;
+      let wrapper = svg.querySelector('#logo-symbol-wrapper');
+      if (!wrapper) {
+        const firstGroup = svg.querySelector('g');
+        if (!firstGroup) return null;
+        wrapper = document.createElementNS(ns, 'g');
+        wrapper.setAttribute('id', 'logo-symbol-wrapper');
+        firstGroup.parentNode.insertBefore(wrapper, firstGroup);
+        wrapper.appendChild(firstGroup);
+      }
+
+      state.symbolWrapper = wrapper;
+      try {
+        const bbox = wrapper.getBBox();
+        state.symbolCenterX = bbox.x + bbox.width / 2;
+        state.symbolCenterY = bbox.y + bbox.height / 2;
+      } catch (_err) {
+        const vb = parseViewBox(svg);
+        state.symbolCenterX = vb.x + vb.width / 2;
+        state.symbolCenterY = vb.y + vb.height / 2;
+      }
+      return wrapper;
+    }
+
     function initControlDefaultsFromSvg() {
       if (!state.editableSvg) return;
       const t1 = state.editableSvg.querySelector('#line1');
@@ -769,20 +1583,20 @@
 
       const y1 = parseFloat(t1.getAttribute('y') || '0');
       const y2 = parseFloat(t2.getAttribute('y') || '0');
-      const fs = parseFloat(t1.getAttribute('font-size') || '109');
+      const fs1 = parseFloat(t1.getAttribute('font-size') || String(DEFAULT_VERTICAL_SETTINGS.line1Size));
+      const fs2 = parseFloat(t2.getAttribute('font-size') || String(fs1));
+      const inferredLineSpacing = fs2 > 0 ? (y2 - y1) / fs2 : DEFAULT_VERTICAL_SETTINGS.lineSpacing;
 
       state.baseY1 = y1;
       state.baseY2 = y2;
-      state.baseSize = fs;
-      state.baseSpacing = DEFAULT_VERTICAL_SETTINGS.letterSpacing;
 
-      q('font-size').value = String(Math.round(fs));
-      q('letter-spacing').value = String(DEFAULT_VERTICAL_SETTINGS.letterSpacing);
-      q('line-spacing').value = String(DEFAULT_VERTICAL_SETTINGS.lineSpacing);
-      q('font-weight').value = String(DEFAULT_VERTICAL_SETTINGS.fontWeight);
-      q('font-italic').checked = DEFAULT_VERTICAL_SETTINGS.italic;
-      q('font-small-caps').checked = DEFAULT_VERTICAL_SETTINGS.smallCaps;
-      q('stroke-thickness').value = String(DEFAULT_VERTICAL_SETTINGS.strokeThickness);
+      // Only set defaults if URL didn't override them
+      const params = new URLSearchParams(window.location.search);
+      if (!params.has('l1s')) q('line1-size').value = String(Math.round(fs1));
+      if (!params.has('l2s')) q('line2-size').value = String(Math.round(fs2));
+      if (!params.has('lns')) q('line-spacing').value = String(clamp(inferredLineSpacing, 0.7, 1.6));
+
+      ensurePortraitSymbolWrapper();
     }
 
     function applyControls() {
@@ -792,25 +1606,33 @@
       const line1 = q('line1').value || ' ';
       const line2 = q('line2').value || ' ';
       const picker = q('font-picker');
-      const selected = picker.selectedOptions && picker.selectedOptions[0] ? picker.selectedOptions[0] : null;
+      const selected = picker.selectedOptions?.[0] || null;
       const font = selected ? selected.value : `${DEFAULT_FONT_LABEL}, Garamond, serif`;
       const googleFamily = selected ? selected.dataset.google : DEFAULT_FONT_LABEL;
       ensureGoogleFontLoaded(googleFamily);
-      const fontSize = parseFloat(q('font-size').value);
-      const letterSpacing = parseFloat(q('letter-spacing').value);
+      const line1Size = parseFloat(q('line1-size').value);
+      const line2Size = parseFloat(q('line2-size').value);
+      const line1LetterSpacing = parseFloat(q('line1-letter-spacing').value);
+      const line2LetterSpacing = parseFloat(q('line2-letter-spacing').value);
       const lineSpacing = parseFloat(q('line-spacing').value);
       const fontWeight = parseInt(q('font-weight').value, 10);
       const isItalic = q('font-italic').checked;
       const isSmallCaps = q('font-small-caps').checked;
       const strokeThicknessPct = parseFloat(q('stroke-thickness').value);
-      const strokeWidthPx = (fontSize * strokeThicknessPct) / 100;
+      const strokeWidth1 = (line1Size * strokeThicknessPct) / 100;
+      const strokeWidth2 = (line2Size * strokeThicknessPct) / 100;
+      const logoScalePct = parseFloat(q('logo-scale').value);
+      const logoScale = logoScalePct / 100;
       const gold = isGoldMode();
 
-      setOutput('font-size-val', `${fontSize.toFixed(0)} px`);
-      setOutput('letter-spacing-val', `${letterSpacing.toFixed(1)} px`);
-      setOutput('line-spacing-val', `${lineSpacing.toFixed(2)}x`);
-      setOutput('font-weight-val', `${fontWeight}`);
-      setOutput('stroke-thickness-val', `${strokeThicknessPct.toFixed(2)}%`);
+      setOutput('line1-size-val', line1Size.toFixed(0));
+      setOutput('line2-size-val', line2Size.toFixed(0));
+      setOutput('line1-letter-spacing-val', line1LetterSpacing.toFixed(1));
+      setOutput('line2-letter-spacing-val', line2LetterSpacing.toFixed(1));
+      setOutput('line-spacing-val', lineSpacing.toFixed(2));
+      setOutput('font-weight-val', fontWeight);
+      setOutput('stroke-thickness-val', strokeThicknessPct.toFixed(2));
+      setOutput('logo-scale-val', `${logoScalePct.toFixed(0)}%`);
       setOutput('brand-color-val', gold ? 'GOLD' : brandColor.toUpperCase());
 
       const t1 = state.editableSvg.querySelector('#line1');
@@ -818,26 +1640,38 @@
       if (!t1 || !t2) return;
 
       const y1 = state.baseY1 ?? parseFloat(t1.getAttribute('y') || '0');
-      const y2 = y1 + fontSize * lineSpacing;
+      const y2 = y1 + line2Size * lineSpacing;
 
-      for (const t of [t1, t2]) {
-        t.setAttribute('font-family', font);
-        t.setAttribute('font-size', String(fontSize));
-        t.setAttribute('letter-spacing', String(letterSpacing));
-        t.setAttribute('font-weight', String(fontWeight));
-        t.setAttribute('font-style', isItalic ? 'italic' : 'normal');
-        t.setAttribute('font-variant', isSmallCaps ? 'small-caps' : 'normal');
-        applyPaintToText(state.editableSvg, t, brandColor, strokeThicknessPct, strokeWidthPx);
-      }
+      t1.setAttribute('font-family', font);
+      t1.setAttribute('letter-spacing', String(line1LetterSpacing));
+      t1.setAttribute('font-weight', String(fontWeight));
+      t1.setAttribute('font-style', isItalic ? 'italic' : 'normal');
+      t1.setAttribute('font-variant', isSmallCaps ? 'small-caps' : 'normal');
+      t1.setAttribute('font-size', String(line1Size));
+
+      t2.setAttribute('font-family', font);
+      t2.setAttribute('letter-spacing', String(line2LetterSpacing));
+      t2.setAttribute('font-weight', String(fontWeight));
+      t2.setAttribute('font-style', isItalic ? 'italic' : 'normal');
+      t2.setAttribute('font-variant', isSmallCaps ? 'small-caps' : 'normal');
+      t2.setAttribute('font-size', String(line2Size));
+
+      applyPaintToText(state.editableSvg, t1, brandColor, strokeThicknessPct, strokeWidth1);
+      applyPaintToText(state.editableSvg, t2, brandColor, strokeThicknessPct, strokeWidth2);
 
       t1.setAttribute('y', String(y1));
       t2.setAttribute('y', String(y2));
       t1.textContent = line1;
       t2.textContent = line2;
 
-      const symbolGroup = state.editableSvg.querySelector('g');
-      if (symbolGroup) {
-        applyPaintToNode(state.editableSvg, symbolGroup, brandColor);
+      const symbolWrapper = ensurePortraitSymbolWrapper();
+      if (symbolWrapper) {
+        applyPaintToNode(state.editableSvg, symbolWrapper, brandColor);
+        if (Number.isFinite(state.symbolCenterX) && Number.isFinite(state.symbolCenterY)) {
+          const cx = state.symbolCenterX;
+          const cy = state.symbolCenterY;
+          symbolWrapper.setAttribute('transform', `translate(${cx} ${cy}) scale(${logoScale}) translate(${-cx} ${-cy})`);
+        }
       }
     }
 
@@ -847,7 +1681,7 @@
       const brandColor = getBrandColor();
       const text = q('h-text').value || ' ';
       const picker = q('h-font-picker');
-      const selected = picker.selectedOptions && picker.selectedOptions[0] ? picker.selectedOptions[0] : null;
+      const selected = picker.selectedOptions?.[0] || null;
       const font = selected ? selected.value : `${DEFAULT_FONT_LABEL}, Garamond, serif`;
       const googleFamily = selected ? selected.dataset.google : DEFAULT_FONT_LABEL;
       ensureGoogleFontLoaded(googleFamily);
@@ -911,21 +1745,69 @@
       applyPaintToText(svg, textEl, brandColor, strokeThicknessPct, strokeWidthPx);
       svg.appendChild(textEl);
 
+      state.horizontalSvg = svg;
       q('horizontal-preview').replaceChildren(svg);
     }
 
-    function downloadCurrentEditable() {
-      if (!state.editableSvg) return;
-      const serialized = new XMLSerializer().serializeToString(state.editableSvg);
+    function downloadSvg(svgNode, filename) {
+      if (!svgNode) return;
+
+      // Calculate actual content bounds from live SVG
+      let bbox;
+      try {
+        bbox = svgNode.getBBox();
+      } catch (e) {
+        bbox = null;
+      }
+
+      const clone = svgNode.cloneNode(true);
+      if (!clone.getAttribute('xmlns')) {
+        clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      }
+      if (!clone.getAttribute('xmlns:xlink')) {
+        clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+      }
+
+      // Use actual bounding box with padding, or fall back to existing viewBox
+      // Extra padding for stroke width, filter effects, and text overhang
+      const padX = 60;  // More horizontal padding for text letter-spacing
+      const padY = 40;
+      let vbX, vbY, vbW, vbH;
+      if (bbox && bbox.width > 0 && bbox.height > 0) {
+        vbX = Math.floor(bbox.x - padX);
+        vbY = Math.floor(bbox.y - padY);
+        vbW = Math.ceil(bbox.width + padX * 2);
+        vbH = Math.ceil(bbox.height + padY * 2);
+      } else {
+        const vb = parseViewBox(clone);
+        vbX = vb.x;
+        vbY = vb.y;
+        vbW = vb.width;
+        vbH = vb.height;
+      }
+
+      clone.setAttribute('viewBox', `${vbX} ${vbY} ${vbW} ${vbH}`);
+      clone.setAttribute('width', String(vbW));
+      clone.setAttribute('height', String(vbH));
+
+      const serialized = `<?xml version="1.0" encoding="utf-8"?>\n${new XMLSerializer().serializeToString(clone)}`;
       const blob = new Blob([serialized], { type: 'image/svg+xml;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'logo-editable-current.svg';
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
+    }
+
+    function exportPortraitSvg() {
+      downloadSvg(state.editableSvg, 'aksmed-portrait-current.svg');
+    }
+
+    function exportLandscapeSvg() {
+      downloadSvg(state.horizontalSvg, 'aksmed-landscape-current.svg');
     }
 
     async function loadLatest() {
@@ -939,34 +1821,43 @@
         const symbolSvg = parseSvg(symbolText);
         state.editableSvg = document.importNode(editableSvg, true);
         state.symbolSvgTemplate = document.importNode(symbolSvg, true);
+        state.horizontalSvg = null;
+        state.symbolWrapper = null;
+        state.symbolCenterX = null;
+        state.symbolCenterY = null;
         q('editable-preview').replaceChildren(state.editableSvg);
 
         initControlDefaultsFromSvg();
         applyControls();
         applyHorizontalControls();
 
-        status.textContent = `Latest editable + horizontal previews loaded: ${new Date().toLocaleTimeString()}`;
+        status.textContent = `Loaded: ${new Date().toLocaleTimeString()}`;
       } catch (err) {
-        status.textContent = `Load error: ${err.message}`;
+        status.textContent = `Error: ${err.message}`;
       }
     }
 
+    // Initialize
     populateFontPicker('font-picker');
     populateFontPicker('h-font-picker');
 
-    q('download-current-btn').addEventListener('click', downloadCurrentEditable);
     q('refresh-btn').addEventListener('click', loadLatest);
+    q('download-portrait-btn').addEventListener('click', exportPortraitSvg);
+    q('download-landscape-btn').addEventListener('click', exportLandscapeSvg);
 
     q('line1').addEventListener('input', applyControls);
     q('line2').addEventListener('input', applyControls);
     q('font-picker').addEventListener('change', applyControls);
-    q('font-size').addEventListener('input', applyControls);
-    q('letter-spacing').addEventListener('input', applyControls);
+    q('line1-size').addEventListener('input', applyControls);
+    q('line2-size').addEventListener('input', applyControls);
+    q('line1-letter-spacing').addEventListener('input', applyControls);
+    q('line2-letter-spacing').addEventListener('input', applyControls);
     q('line-spacing').addEventListener('input', applyControls);
     q('font-weight').addEventListener('input', applyControls);
     q('font-italic').addEventListener('change', applyControls);
     q('font-small-caps').addEventListener('change', applyControls);
     q('stroke-thickness').addEventListener('input', applyControls);
+    q('logo-scale').addEventListener('input', applyControls);
 
     q('h-text').addEventListener('input', applyHorizontalControls);
     q('h-font-picker').addEventListener('change', applyHorizontalControls);
@@ -978,6 +1869,7 @@
     q('h-gap').addEventListener('input', applyHorizontalControls);
     q('h-font-italic').addEventListener('change', applyHorizontalControls);
     q('h-font-small-caps').addEventListener('change', applyHorizontalControls);
+
     q('paint-mode').addEventListener('change', () => {
       syncPaintModeUI();
       applyControls();
@@ -999,8 +1891,15 @@
       applyHorizontalControls();
     });
 
+    // Initialize URL state, version history, and load
     syncPaintModeUI();
-    loadLatest();
+    UrlState.init();
+    VersionHistory.init();
+    loadLatest().then(() => {
+      applyControls();
+      applyHorizontalControls();
+      syncPaintModeUI();
+    });
   </script>
 </body>
 </html>
