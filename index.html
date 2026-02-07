@@ -66,6 +66,27 @@
       gap: 6px;
       margin-left: 4px;
     }
+    .color-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .color-control input[type="color"] {
+      width: 34px;
+      height: 34px;
+      border: 1px solid #2a3140;
+      border-radius: 7px;
+      padding: 2px;
+      background: #0f141d;
+      cursor: pointer;
+    }
+    .color-chip {
+      min-width: 78px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: #d8e3ff;
+    }
     .grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -187,6 +208,10 @@
     <div class="actions">
       <button id="download-current-btn" class="btn" type="button">Download Current Editable</button>
       <button id="refresh-btn" class="btn" type="button">Refresh Latest</button>
+      <label class="color-control">Brand Color
+        <input id="brand-color" type="color" value="#000000" />
+        <span id="brand-color-val" class="color-chip">#000000</span>
+      </label>
     </div>
 
     <div class="grid">
@@ -400,6 +425,11 @@
       q(id).textContent = value;
     }
 
+    function getBrandColor() {
+      const color = (q('brand-color') && q('brand-color').value) || '#000000';
+      return color.toLowerCase();
+    }
+
     function ensureGoogleFontLoaded(family) {
       if (!family || state.loadedGoogleFonts.has(family)) return;
       const id = `gf-${family.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
@@ -485,6 +515,7 @@
     function applyControls() {
       if (!state.editableSvg) return;
 
+      const brandColor = getBrandColor();
       const line1 = q('line1').value || ' ';
       const line2 = q('line2').value || ' ';
       const picker = q('font-picker');
@@ -506,6 +537,7 @@
       setOutput('line-spacing-val', `${lineSpacing.toFixed(2)}x`);
       setOutput('font-weight-val', `${fontWeight}`);
       setOutput('stroke-thickness-val', `${strokeThicknessPct.toFixed(2)}%`);
+      setOutput('brand-color-val', brandColor.toUpperCase());
 
       const t1 = state.editableSvg.querySelector('#line1');
       const t2 = state.editableSvg.querySelector('#line2');
@@ -521,8 +553,9 @@
         t.setAttribute('font-weight', String(fontWeight));
         t.setAttribute('font-style', isItalic ? 'italic' : 'normal');
         t.setAttribute('font-variant', isSmallCaps ? 'small-caps' : 'normal');
+        t.setAttribute('fill', brandColor);
         if (strokeThicknessPct > 0) {
-          t.setAttribute('stroke', '#000000');
+          t.setAttribute('stroke', brandColor);
           t.setAttribute('stroke-width', String(strokeWidthPx));
           t.setAttribute('paint-order', 'stroke fill');
           t.setAttribute('stroke-linejoin', 'round');
@@ -540,11 +573,17 @@
       t2.setAttribute('y', String(y2));
       t1.textContent = line1;
       t2.textContent = line2;
+
+      const symbolGroup = state.editableSvg.querySelector('g');
+      if (symbolGroup) {
+        symbolGroup.setAttribute('fill', brandColor);
+      }
     }
 
     function applyHorizontalControls() {
       if (!state.symbolSvgTemplate) return;
 
+      const brandColor = getBrandColor();
       const text = q('h-text').value || ' ';
       const picker = q('h-font-picker');
       const selected = picker.selectedOptions && picker.selectedOptions[0] ? picker.selectedOptions[0] : null;
@@ -569,6 +608,7 @@
       setOutput('h-stroke-thickness-val', `${strokeThicknessPct.toFixed(2)}%`);
       setOutput('h-logo-scale-val', `${logoScalePct.toFixed(0)}%`);
       setOutput('h-gap-val', `${gap.toFixed(0)} px`);
+      setOutput('brand-color-val', brandColor.toUpperCase());
 
       const base = state.symbolSvgTemplate;
       const vb = parseViewBox(base);
@@ -593,6 +633,7 @@
       for (const child of Array.from(base.children)) {
         symbolGroup.appendChild(child.cloneNode(true));
       }
+      symbolGroup.setAttribute('fill', brandColor);
       svg.appendChild(symbolGroup);
 
       const textEl = document.createElementNS(ns, 'text');
@@ -605,9 +646,9 @@
       textEl.setAttribute('font-weight', String(fontWeight));
       textEl.setAttribute('font-style', isItalic ? 'italic' : 'normal');
       textEl.setAttribute('font-variant', isSmallCaps ? 'small-caps' : 'normal');
-      textEl.setAttribute('fill', '#000000');
+      textEl.setAttribute('fill', brandColor);
       if (strokeThicknessPct > 0) {
-        textEl.setAttribute('stroke', '#000000');
+        textEl.setAttribute('stroke', brandColor);
         textEl.setAttribute('stroke-width', String(strokeWidthPx));
         textEl.setAttribute('paint-order', 'stroke fill');
         textEl.setAttribute('stroke-linejoin', 'round');
@@ -682,6 +723,10 @@
     q('h-gap').addEventListener('input', applyHorizontalControls);
     q('h-font-italic').addEventListener('change', applyHorizontalControls);
     q('h-font-small-caps').addEventListener('change', applyHorizontalControls);
+    q('brand-color').addEventListener('input', () => {
+      applyControls();
+      applyHorizontalControls();
+    });
 
     loadLatest();
   </script>
