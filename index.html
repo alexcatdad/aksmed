@@ -8,7 +8,7 @@
   <meta http-equiv="Expires" content="0" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500;600;700&family=Cormorant:wght@500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Cormorant+Infant:wght@500;600;700&family=Cormorant+SC:wght@500;600;700&family=Cormorant+Unicase:wght@500;600;700&family=Crimson+Pro:wght@500;600;700&family=EB+Garamond:wght@500;600;700&family=Lora:wght@500;600;700&family=Source+Serif+4:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&display=swap" rel="stylesheet" />
   <title>AKSMED Editable Preview</title>
   <style>
     :root {
@@ -155,7 +155,6 @@
     <div class="actions">
       <button id="download-current-btn" class="btn" type="button">Download Current Editable</button>
       <button id="refresh-btn" class="btn" type="button">Refresh Latest</button>
-      <label class="small"><input id="auto-refresh" type="checkbox" checked />Auto refresh (2s)</label>
     </div>
 
     <div class="grid">
@@ -171,18 +170,7 @@
           <label>Line 2<input id="line2" type="text" value="CLINIQUE" /></label>
 
           <label>Serif Font
-            <select id="font-picker">
-              <option value="Cormorant Garamond, Garamond, serif" selected>Cormorant Garamond</option>
-              <option value="Cormorant, Garamond, serif">Cormorant</option>
-              <option value="Cormorant Infant, Garamond, serif">Cormorant Infant</option>
-              <option value="Cormorant SC, Garamond, serif">Cormorant SC</option>
-              <option value="Cormorant Unicase, Garamond, serif">Cormorant Unicase</option>
-              <option value="EB Garamond, Garamond, serif">EB Garamond</option>
-              <option value="Crimson Pro, Garamond, serif">Crimson Pro</option>
-              <option value="Alegreya, Georgia, serif">Alegreya</option>
-              <option value="Source Serif 4, Georgia, serif">Source Serif 4</option>
-              <option value="Lora, Georgia, serif">Lora</option>
-            </select>
+            <select id="font-picker"></select>
           </label>
 
           <label>Font Size
@@ -215,13 +203,77 @@
   </div>
 
   <script>
+    const DEFAULT_FONT_LABEL = 'Cormorant Garamond';
+    const FONT_OPTIONS = [
+      { label: 'Cormorant Garamond', css: 'Cormorant Garamond, Garamond, serif', google: 'Cormorant Garamond' },
+      { label: 'Cormorant', css: 'Cormorant, Garamond, serif', google: 'Cormorant' },
+      { label: 'Cormorant Infant', css: 'Cormorant Infant, Garamond, serif', google: 'Cormorant Infant' },
+      { label: 'Cormorant SC', css: 'Cormorant SC, Garamond, serif', google: 'Cormorant SC' },
+      { label: 'Cormorant Unicase', css: 'Cormorant Unicase, Garamond, serif', google: 'Cormorant Unicase' },
+      { label: 'EB Garamond', css: 'EB Garamond, Garamond, serif', google: 'EB Garamond' },
+      { label: 'Crimson Pro', css: 'Crimson Pro, Garamond, serif', google: 'Crimson Pro' },
+      { label: 'Alegreya', css: 'Alegreya, Georgia, serif', google: 'Alegreya' },
+      { label: 'Source Serif 4', css: 'Source Serif 4, Georgia, serif', google: 'Source Serif 4' },
+      { label: 'Lora', css: 'Lora, Georgia, serif', google: 'Lora' },
+      { label: 'Alegreya SC', css: 'Alegreya SC, Georgia, serif', google: 'Alegreya SC' },
+      { label: 'Arvo', css: 'Arvo, Georgia, serif', google: 'Arvo' },
+      { label: 'Bitter', css: 'Bitter, Georgia, serif', google: 'Bitter' },
+      { label: 'Bodoni Moda', css: 'Bodoni Moda, Didot, serif', google: 'Bodoni Moda' },
+      { label: 'Bree Serif', css: 'Bree Serif, Georgia, serif', google: 'Bree Serif' },
+      { label: 'Cardo', css: 'Cardo, Georgia, serif', google: 'Cardo' },
+      { label: 'Cinzel', css: 'Cinzel, Georgia, serif', google: 'Cinzel' },
+      { label: 'Copse', css: 'Copse, Georgia, serif', google: 'Copse' },
+      { label: 'Cormorant Upright', css: 'Cormorant Upright, Garamond, serif', google: 'Cormorant Upright' },
+      { label: 'Crimson Text', css: 'Crimson Text, Georgia, serif', google: 'Crimson Text' },
+      { label: 'DM Serif Display', css: 'DM Serif Display, Georgia, serif', google: 'DM Serif Display' },
+      { label: 'DM Serif Text', css: 'DM Serif Text, Georgia, serif', google: 'DM Serif Text' },
+      { label: 'Domine', css: 'Domine, Georgia, serif', google: 'Domine' },
+      { label: 'Fauna One', css: 'Fauna One, Georgia, serif', google: 'Fauna One' },
+      { label: 'Forum', css: 'Forum, Georgia, serif', google: 'Forum' },
+      { label: 'Gloock', css: 'Gloock, Georgia, serif', google: 'Gloock' },
+      { label: 'Inknut Antiqua', css: 'Inknut Antiqua, Georgia, serif', google: 'Inknut Antiqua' },
+      { label: 'Joan', css: 'Joan, Georgia, serif', google: 'Joan' },
+      { label: 'Libre Baskerville', css: 'Libre Baskerville, Baskerville, serif', google: 'Libre Baskerville' },
+      { label: 'Libre Caslon Display', css: 'Libre Caslon Display, Baskerville, serif', google: 'Libre Caslon Display' },
+      { label: 'Literata', css: 'Literata, Georgia, serif', google: 'Literata' },
+      { label: 'Maitree', css: 'Maitree, Georgia, serif', google: 'Maitree' },
+      { label: 'Merriweather', css: 'Merriweather, Georgia, serif', google: 'Merriweather' },
+      { label: 'Neuton', css: 'Neuton, Georgia, serif', google: 'Neuton' },
+      { label: 'Newsreader', css: 'Newsreader, Georgia, serif', google: 'Newsreader' },
+      { label: 'Noto Serif', css: 'Noto Serif, Georgia, serif', google: 'Noto Serif' },
+      { label: 'Old Standard TT', css: 'Old Standard TT, Georgia, serif', google: 'Old Standard TT' },
+      { label: 'Oranienbaum', css: 'Oranienbaum, Georgia, serif', google: 'Oranienbaum' },
+      { label: 'Petrona', css: 'Petrona, Georgia, serif', google: 'Petrona' },
+      { label: 'Playfair Display', css: 'Playfair Display, Georgia, serif', google: 'Playfair Display' },
+      { label: 'Playfair Display SC', css: 'Playfair Display SC, Georgia, serif', google: 'Playfair Display SC' },
+      { label: 'Prata', css: 'Prata, Georgia, serif', google: 'Prata' },
+      { label: 'PT Serif', css: 'PT Serif, Georgia, serif', google: 'PT Serif' },
+      { label: 'Quattrocento', css: 'Quattrocento, Georgia, serif', google: 'Quattrocento' },
+      { label: 'Radley', css: 'Radley, Georgia, serif', google: 'Radley' },
+      { label: 'Rokkitt', css: 'Rokkitt, Georgia, serif', google: 'Rokkitt' },
+      { label: 'Rosarivo', css: 'Rosarivo, Georgia, serif', google: 'Rosarivo' },
+      { label: 'Rufina', css: 'Rufina, Georgia, serif', google: 'Rufina' },
+      { label: 'Slabo 27px', css: 'Slabo 27px, Georgia, serif', google: 'Slabo 27px' },
+      { label: 'Sorts Mill Goudy', css: 'Sorts Mill Goudy, Georgia, serif', google: 'Sorts Mill Goudy' },
+      { label: 'Spectral', css: 'Spectral, Georgia, serif', google: 'Spectral' },
+      { label: 'Tinos', css: 'Tinos, Georgia, serif', google: 'Tinos' },
+      { label: 'Trirong', css: 'Trirong, Georgia, serif', google: 'Trirong' },
+      { label: 'Vollkorn', css: 'Vollkorn, Georgia, serif', google: 'Vollkorn' },
+      { label: 'Vidaloka', css: 'Vidaloka, Georgia, serif', google: 'Vidaloka' },
+      { label: 'Yrsa', css: 'Yrsa, Georgia, serif', google: 'Yrsa' },
+      { label: 'Zilla Slab', css: 'Zilla Slab, Georgia, serif', google: 'Zilla Slab' },
+      { label: 'Baskervville', css: 'Baskervville, Baskerville, serif', google: 'Baskervville' },
+      { label: 'Alice', css: 'Alice, Georgia, serif', google: 'Alice' },
+      { label: 'Lusitana', css: 'Lusitana, Georgia, serif', google: 'Lusitana' }
+    ];
+
     const state = {
       editableSvg: null,
-      timer: null,
       baseY1: null,
       baseY2: null,
       baseSize: 109,
-      baseSpacing: 2
+      baseSpacing: 2,
+      loadedGoogleFonts: new Set(['Cormorant Garamond'])
     };
 
     function q(id) {
@@ -230,6 +282,37 @@
 
     function setOutput(id, value) {
       q(id).textContent = value;
+    }
+
+    function ensureGoogleFontLoaded(family) {
+      if (!family || state.loadedGoogleFonts.has(family)) return;
+      const id = `gf-${family.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+      if (document.getElementById(id)) {
+        state.loadedGoogleFonts.add(family);
+        return;
+      }
+      const link = document.createElement('link');
+      link.id = id;
+      link.rel = 'stylesheet';
+      const familyParam = encodeURIComponent(family).replace(/%20/g, '+');
+      link.href = `https://fonts.googleapis.com/css2?family=${familyParam}&display=swap`;
+      document.head.appendChild(link);
+      state.loadedGoogleFonts.add(family);
+    }
+
+    function populateFontPicker() {
+      const picker = q('font-picker');
+      picker.replaceChildren();
+      for (const opt of FONT_OPTIONS) {
+        const option = document.createElement('option');
+        option.value = opt.css;
+        option.textContent = opt.label;
+        option.dataset.google = opt.google || '';
+        if (opt.label === DEFAULT_FONT_LABEL) {
+          option.selected = true;
+        }
+        picker.appendChild(option);
+      }
     }
 
     async function fetchTextNoCache(path) {
@@ -275,7 +358,11 @@
 
       const line1 = q('line1').value || ' ';
       const line2 = q('line2').value || ' ';
-      const font = q('font-picker').value;
+      const picker = q('font-picker');
+      const selected = picker.selectedOptions && picker.selectedOptions[0] ? picker.selectedOptions[0] : null;
+      const font = selected ? selected.value : `${DEFAULT_FONT_LABEL}, Garamond, serif`;
+      const googleFamily = selected ? selected.dataset.google : DEFAULT_FONT_LABEL;
+      ensureGoogleFontLoaded(googleFamily);
       const fontSize = parseFloat(q('font-size').value);
       const letterSpacing = parseFloat(q('letter-spacing').value);
       const lineSpacing = parseFloat(q('line-spacing').value);
@@ -334,19 +421,10 @@
       }
     }
 
-    function setAutoRefresh(enabled) {
-      if (state.timer) {
-        clearInterval(state.timer);
-        state.timer = null;
-      }
-      if (enabled) {
-        state.timer = setInterval(loadLatest, 2000);
-      }
-    }
+    populateFontPicker();
 
     q('download-current-btn').addEventListener('click', downloadCurrentEditable);
     q('refresh-btn').addEventListener('click', loadLatest);
-    q('auto-refresh').addEventListener('change', (e) => setAutoRefresh(e.target.checked));
 
     q('line1').addEventListener('input', applyControls);
     q('line2').addEventListener('input', applyControls);
@@ -355,7 +433,6 @@
     q('letter-spacing').addEventListener('input', applyControls);
     q('line-spacing').addEventListener('input', applyControls);
 
-    setAutoRefresh(true);
     loadLatest();
   </script>
 </body>
