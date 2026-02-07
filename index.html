@@ -92,6 +92,7 @@
       background: #fff;
     }
     .frame.dark { background: #0c0f15; }
+    .frame.wide { aspect-ratio: 16 / 7; }
     .frame img,
     .frame svg {
       width: 100%;
@@ -195,15 +196,15 @@
 
           <label>Letter Spacing
             <div class="range-row">
-              <input id="letter-spacing" type="range" min="-2" max="12" step="0.1" value="2" />
-              <output id="letter-spacing-val">2 px</output>
+              <input id="letter-spacing" type="range" min="-2" max="12" step="0.1" value="5" />
+              <output id="letter-spacing-val">5 px</output>
             </div>
           </label>
 
           <label>Line Spacing
             <div class="range-row">
-              <input id="line-spacing" type="range" min="0.7" max="1.6" step="0.01" value="1.0" />
-              <output id="line-spacing-val">1.00x</output>
+              <input id="line-spacing" type="range" min="0.7" max="1.6" step="0.01" value="0.92" />
+              <output id="line-spacing-val">0.92x</output>
             </div>
           </label>
 
@@ -216,8 +217,8 @@
 
           <label>Extra Stroke Thickness
             <div class="range-row">
-              <input id="stroke-thickness" type="range" min="0" max="1.2" step="0.05" value="0" />
-              <output id="stroke-thickness-val">0.00 px</output>
+              <input id="stroke-thickness" type="range" min="0" max="1.2" step="0.05" value="0.4" />
+              <output id="stroke-thickness-val">0.40 px</output>
             </div>
           </label>
 
@@ -227,6 +228,64 @@
 
         <div id="editable-preview" class="frame"></div>
       </section>
+
+      <section class="card">
+        <h2>Horizontal Lockup (Logo Left, Text Right)</h2>
+        <div class="controls">
+          <label>One-Line Text<input id="h-text" type="text" value="AKSMED CLINIQUE" /></label>
+
+          <label>Serif Font
+            <select id="h-font-picker"></select>
+          </label>
+
+          <label>Font Size
+            <div class="range-row">
+              <input id="h-font-size" type="range" min="48" max="180" step="1" value="88" />
+              <output id="h-font-size-val">88 px</output>
+            </div>
+          </label>
+
+          <label>Letter Spacing
+            <div class="range-row">
+              <input id="h-letter-spacing" type="range" min="-2" max="12" step="0.1" value="5" />
+              <output id="h-letter-spacing-val">5 px</output>
+            </div>
+          </label>
+
+          <label>Font Weight (Thickness)
+            <div class="range-row">
+              <input id="h-font-weight" type="range" min="300" max="700" step="100" value="700" />
+              <output id="h-font-weight-val">700</output>
+            </div>
+          </label>
+
+          <label>Extra Stroke Thickness
+            <div class="range-row">
+              <input id="h-stroke-thickness" type="range" min="0" max="1.2" step="0.05" value="0.4" />
+              <output id="h-stroke-thickness-val">0.40 px</output>
+            </div>
+          </label>
+
+          <label>Logo Scale
+            <div class="range-row">
+              <input id="h-logo-scale" type="range" min="0.5" max="1.6" step="0.01" value="1.0" />
+              <output id="h-logo-scale-val">1.00x</output>
+            </div>
+          </label>
+
+          <label>Gap (Logo to Text)
+            <div class="range-row">
+              <input id="h-gap" type="range" min="16" max="220" step="1" value="52" />
+              <output id="h-gap-val">52 px</output>
+            </div>
+          </label>
+
+          <label class="toggle"><input id="h-font-italic" type="checkbox" /> Italic</label>
+          <label class="toggle"><input id="h-font-small-caps" type="checkbox" /> Small Caps</label>
+        </div>
+
+        <div id="horizontal-preview" class="frame wide"></div>
+      </section>
     </div>
 
     <div class="status" id="status">Loading latest editable SVG...</div>
@@ -234,6 +293,14 @@
 
   <script>
     const DEFAULT_FONT_LABEL = 'Cormorant Garamond';
+    const DEFAULT_VERTICAL_SETTINGS = {
+      letterSpacing: 5,
+      lineSpacing: 0.92,
+      strokeThickness: 0.4,
+      fontWeight: 700,
+      italic: false,
+      smallCaps: false
+    };
     const FONT_OPTIONS = [
       { label: 'Cormorant Garamond', css: 'Cormorant Garamond, Garamond, serif', google: 'Cormorant Garamond' },
       { label: 'Cormorant', css: 'Cormorant, Garamond, serif', google: 'Cormorant' },
@@ -299,6 +366,7 @@
 
     const state = {
       editableSvg: null,
+      symbolSvgTemplate: null,
       baseY1: null,
       baseY2: null,
       baseSize: 109,
@@ -330,8 +398,9 @@
       state.loadedGoogleFonts.add(family);
     }
 
-    function populateFontPicker() {
-      const picker = q('font-picker');
+    function populateFontPicker(pickerId) {
+      const picker = q(pickerId);
+      if (!picker) return;
       picker.replaceChildren();
       for (const opt of FONT_OPTIONS) {
         const option = document.createElement('option');
@@ -343,6 +412,16 @@
         }
         picker.appendChild(option);
       }
+    }
+
+    function parseViewBox(svg) {
+      const vb = svg.getAttribute('viewBox');
+      if (!vb) return { x: 0, y: 0, width: 1, height: 1 };
+      const p = vb.trim().split(/\s+/).map(Number);
+      if (p.length !== 4 || p.some((n) => Number.isNaN(n))) {
+        return { x: 0, y: 0, width: 1, height: 1 };
+      }
+      return { x: p[0], y: p[1], width: p[2], height: p[3] };
     }
 
     async function fetchTextNoCache(path) {
@@ -370,25 +449,19 @@
       const y1 = parseFloat(t1.getAttribute('y') || '0');
       const y2 = parseFloat(t2.getAttribute('y') || '0');
       const fs = parseFloat(t1.getAttribute('font-size') || '109');
-      const ls = parseFloat(t1.getAttribute('letter-spacing') || '2');
-      const fw = parseFloat(t1.getAttribute('font-weight') || '700');
-      const style = t1.getAttribute('font-style') || 'normal';
-      const variant = t1.getAttribute('font-variant') || 'normal';
-      const sw = parseFloat(t1.getAttribute('stroke-width') || '0');
 
       state.baseY1 = y1;
       state.baseY2 = y2;
       state.baseSize = fs;
-      state.baseSpacing = ls;
+      state.baseSpacing = DEFAULT_VERTICAL_SETTINGS.letterSpacing;
 
       q('font-size').value = String(Math.round(fs));
-      q('letter-spacing').value = String(ls);
-      const lineSpace = (y2 > y1 && fs > 0) ? ((y2 - y1) / fs) : 1.0;
-      q('line-spacing').value = String(Math.max(0.7, Math.min(1.6, lineSpace)));
-      q('font-weight').value = String(Math.max(300, Math.min(700, Math.round(fw / 100) * 100)));
-      q('font-italic').checked = style === 'italic';
-      q('font-small-caps').checked = variant === 'small-caps';
-      q('stroke-thickness').value = String(Math.max(0, Math.min(1.2, sw)));
+      q('letter-spacing').value = String(DEFAULT_VERTICAL_SETTINGS.letterSpacing);
+      q('line-spacing').value = String(DEFAULT_VERTICAL_SETTINGS.lineSpacing);
+      q('font-weight').value = String(DEFAULT_VERTICAL_SETTINGS.fontWeight);
+      q('font-italic').checked = DEFAULT_VERTICAL_SETTINGS.italic;
+      q('font-small-caps').checked = DEFAULT_VERTICAL_SETTINGS.smallCaps;
+      q('stroke-thickness').value = String(DEFAULT_VERTICAL_SETTINGS.strokeThickness);
     }
 
     function applyControls() {
@@ -450,6 +523,80 @@
       t2.textContent = line2;
     }
 
+    function applyHorizontalControls() {
+      if (!state.symbolSvgTemplate) return;
+
+      const text = q('h-text').value || ' ';
+      const picker = q('h-font-picker');
+      const selected = picker.selectedOptions && picker.selectedOptions[0] ? picker.selectedOptions[0] : null;
+      const font = selected ? selected.value : `${DEFAULT_FONT_LABEL}, Garamond, serif`;
+      const googleFamily = selected ? selected.dataset.google : DEFAULT_FONT_LABEL;
+      ensureGoogleFontLoaded(googleFamily);
+
+      const fontSize = parseFloat(q('h-font-size').value);
+      const letterSpacing = parseFloat(q('h-letter-spacing').value);
+      const fontWeight = parseInt(q('h-font-weight').value, 10);
+      const strokeThickness = parseFloat(q('h-stroke-thickness').value);
+      const logoScale = parseFloat(q('h-logo-scale').value);
+      const gap = parseFloat(q('h-gap').value);
+      const isItalic = q('h-font-italic').checked;
+      const isSmallCaps = q('h-font-small-caps').checked;
+
+      setOutput('h-font-size-val', `${fontSize.toFixed(0)} px`);
+      setOutput('h-letter-spacing-val', `${letterSpacing.toFixed(1)} px`);
+      setOutput('h-font-weight-val', `${fontWeight}`);
+      setOutput('h-stroke-thickness-val', `${strokeThickness.toFixed(2)} px`);
+      setOutput('h-logo-scale-val', `${logoScale.toFixed(2)}x`);
+      setOutput('h-gap-val', `${gap.toFixed(0)} px`);
+
+      const base = state.symbolSvgTemplate;
+      const vb = parseViewBox(base);
+      const symbolW = Math.max(1, vb.width * logoScale);
+      const symbolH = Math.max(1, vb.height * logoScale);
+      const textEstimate = Math.max(fontSize * 3, text.length * (fontSize * 0.60 + letterSpacing * 0.42));
+
+      const pad = 28;
+      const width = Math.ceil(pad * 2 + symbolW + gap + textEstimate);
+      const height = Math.ceil(Math.max(symbolH, fontSize * 1.8) + pad * 2);
+
+      const ns = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(ns, 'svg');
+      svg.setAttribute('xmlns', ns);
+      svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      svg.setAttribute('width', '100%');
+      svg.setAttribute('height', '100%');
+      svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+      const symbolGroup = document.createElementNS(ns, 'g');
+      symbolGroup.setAttribute('transform', `translate(${pad - vb.x * logoScale}, ${(height - symbolH) / 2 - vb.y * logoScale}) scale(${logoScale})`);
+      for (const child of Array.from(base.children)) {
+        symbolGroup.appendChild(child.cloneNode(true));
+      }
+      svg.appendChild(symbolGroup);
+
+      const textEl = document.createElementNS(ns, 'text');
+      textEl.textContent = text;
+      textEl.setAttribute('x', String(pad + symbolW + gap));
+      textEl.setAttribute('y', String(height / 2 + fontSize * 0.34));
+      textEl.setAttribute('font-family', font);
+      textEl.setAttribute('font-size', String(fontSize));
+      textEl.setAttribute('letter-spacing', String(letterSpacing));
+      textEl.setAttribute('font-weight', String(fontWeight));
+      textEl.setAttribute('font-style', isItalic ? 'italic' : 'normal');
+      textEl.setAttribute('font-variant', isSmallCaps ? 'small-caps' : 'normal');
+      textEl.setAttribute('fill', '#000000');
+      if (strokeThickness > 0) {
+        textEl.setAttribute('stroke', '#000000');
+        textEl.setAttribute('stroke-width', String(strokeThickness));
+        textEl.setAttribute('paint-order', 'stroke fill');
+        textEl.setAttribute('stroke-linejoin', 'round');
+        textEl.setAttribute('stroke-linecap', 'round');
+      }
+      svg.appendChild(textEl);
+
+      q('horizontal-preview').replaceChildren(svg);
+    }
+
     function downloadCurrentEditable() {
       if (!state.editableSvg) return;
       const serialized = new XMLSerializer().serializeToString(state.editableSvg);
@@ -467,21 +614,28 @@
     async function loadLatest() {
       const status = q('status');
       try {
-        const editableText = await fetchTextNoCache('logo-editable.svg');
+        const [editableText, symbolText] = await Promise.all([
+          fetchTextNoCache('logo-editable.svg'),
+          fetchTextNoCache('logo-symbol.svg')
+        ]);
         const editableSvg = parseSvg(editableText);
+        const symbolSvg = parseSvg(symbolText);
         state.editableSvg = document.importNode(editableSvg, true);
+        state.symbolSvgTemplate = document.importNode(symbolSvg, true);
         q('editable-preview').replaceChildren(state.editableSvg);
 
         initControlDefaultsFromSvg();
         applyControls();
+        applyHorizontalControls();
 
-        status.textContent = `Latest editable SVG loaded: ${new Date().toLocaleTimeString()}`;
+        status.textContent = `Latest editable + horizontal previews loaded: ${new Date().toLocaleTimeString()}`;
       } catch (err) {
         status.textContent = `Load error: ${err.message}`;
       }
     }
 
-    populateFontPicker();
+    populateFontPicker('font-picker');
+    populateFontPicker('h-font-picker');
 
     q('download-current-btn').addEventListener('click', downloadCurrentEditable);
     q('refresh-btn').addEventListener('click', loadLatest);
@@ -496,6 +650,17 @@
     q('font-italic').addEventListener('change', applyControls);
     q('font-small-caps').addEventListener('change', applyControls);
     q('stroke-thickness').addEventListener('input', applyControls);
+
+    q('h-text').addEventListener('input', applyHorizontalControls);
+    q('h-font-picker').addEventListener('change', applyHorizontalControls);
+    q('h-font-size').addEventListener('input', applyHorizontalControls);
+    q('h-letter-spacing').addEventListener('input', applyHorizontalControls);
+    q('h-font-weight').addEventListener('input', applyHorizontalControls);
+    q('h-stroke-thickness').addEventListener('input', applyHorizontalControls);
+    q('h-logo-scale').addEventListener('input', applyHorizontalControls);
+    q('h-gap').addEventListener('input', applyHorizontalControls);
+    q('h-font-italic').addEventListener('change', applyHorizontalControls);
+    q('h-font-small-caps').addEventListener('change', applyHorizontalControls);
 
     loadLatest();
   </script>
