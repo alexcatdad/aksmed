@@ -292,7 +292,7 @@ def write_symbol_svgs(paths: list[str], width: int, height: int) -> None:
             f.write(
                 f'<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 {width} {height}">\n'
             )
-            f.write(f'  <g fill="{fill}" fill-rule="evenodd" stroke="none">\n')
+            f.write(f'  <g fill="{fill}" fill-rule="nonzero" stroke="none">\n')
             for d in paths:
                 f.write(f'    <path d="{d}"/>\n')
             f.write("  </g>\n")
@@ -313,7 +313,7 @@ def write_editable_svg(paths: list[str], width: int, height: int) -> None:
         f.write(
             f'<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 {width} {full_h}">\n'
         )
-        f.write('  <g fill="black" fill-rule="evenodd" stroke="none">\n')
+        f.write('  <g fill="black" fill-rule="nonzero" stroke="none">\n')
         for d in paths:
             f.write(f'    <path d="{d}"/>\n')
         f.write("  </g>\n")
