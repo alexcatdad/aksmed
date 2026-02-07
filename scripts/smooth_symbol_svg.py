@@ -22,7 +22,8 @@ SHARP_TENSION = 0.10
 THICKNESS_SCALE = 0.85
 THICKNESS_MIN = 2
 THICKNESS_MAX = 4
-END_CAP_EXTRA = 1.25
+END_CAP_EXTRA = 0.55
+END_CAP_TRIM_BIAS = 1.35
 
 
 def polygon_area(pts: np.ndarray) -> float:
@@ -160,8 +161,9 @@ def _flatten_end_caps(mask: np.ndarray, skeleton: np.ndarray, half_w: int) -> np
         dot = vy * t[0] + vx * t[1]
         dist = np.hypot(vy, vx)
 
-        # Remove only the forward half of the local cap.
-        cut = (dot > 0) & (dist <= (half_w + END_CAP_EXTRA))
+        # Trim only the outer tip of the forward cap so endpoints stay flatter
+        # without pulling them too far back from nearby paths.
+        cut = (dot > (half_w * END_CAP_TRIM_BIAS)) & (dist <= (half_w + END_CAP_EXTRA))
         out[y_min:y_max, x_min:x_max] &= ~cut
 
     return out
