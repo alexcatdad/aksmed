@@ -233,10 +233,10 @@
             </div>
           </label>
 
-          <label>Extra Stroke Thickness
+          <label>Extra Stroke Thickness (% of Font Size)
             <div class="range-row">
-              <input id="stroke-thickness" type="range" min="0" max="1.2" step="0.05" value="0.4" />
-              <output id="stroke-thickness-val">0.40 px</output>
+              <input id="stroke-thickness" type="range" min="0" max="3" step="0.05" value="0.4" />
+              <output id="stroke-thickness-val">0.40%</output>
             </div>
           </label>
 
@@ -277,10 +277,10 @@
             </div>
           </label>
 
-          <label>Extra Stroke Thickness
+          <label>Extra Stroke Thickness (% of Font Size)
             <div class="range-row">
-              <input id="h-stroke-thickness" type="range" min="0" max="1.2" step="0.05" value="0.4" />
-              <output id="h-stroke-thickness-val">0.40 px</output>
+              <input id="h-stroke-thickness" type="range" min="0" max="3" step="0.05" value="0.4" />
+              <output id="h-stroke-thickness-val">0.40%</output>
             </div>
           </label>
 
@@ -498,13 +498,14 @@
       const fontWeight = parseInt(q('font-weight').value, 10);
       const isItalic = q('font-italic').checked;
       const isSmallCaps = q('font-small-caps').checked;
-      const strokeThickness = parseFloat(q('stroke-thickness').value);
+      const strokeThicknessPct = parseFloat(q('stroke-thickness').value);
+      const strokeWidthPx = (fontSize * strokeThicknessPct) / 100;
 
       setOutput('font-size-val', `${fontSize.toFixed(0)} px`);
       setOutput('letter-spacing-val', `${letterSpacing.toFixed(1)} px`);
       setOutput('line-spacing-val', `${lineSpacing.toFixed(2)}x`);
       setOutput('font-weight-val', `${fontWeight}`);
-      setOutput('stroke-thickness-val', `${strokeThickness.toFixed(2)} px`);
+      setOutput('stroke-thickness-val', `${strokeThicknessPct.toFixed(2)}%`);
 
       const t1 = state.editableSvg.querySelector('#line1');
       const t2 = state.editableSvg.querySelector('#line2');
@@ -520,9 +521,9 @@
         t.setAttribute('font-weight', String(fontWeight));
         t.setAttribute('font-style', isItalic ? 'italic' : 'normal');
         t.setAttribute('font-variant', isSmallCaps ? 'small-caps' : 'normal');
-        if (strokeThickness > 0) {
+        if (strokeThicknessPct > 0) {
           t.setAttribute('stroke', '#000000');
-          t.setAttribute('stroke-width', String(strokeThickness));
+          t.setAttribute('stroke-width', String(strokeWidthPx));
           t.setAttribute('paint-order', 'stroke fill');
           t.setAttribute('stroke-linejoin', 'round');
           t.setAttribute('stroke-linecap', 'round');
@@ -554,7 +555,8 @@
       const fontSize = parseFloat(q('h-font-size').value);
       const letterSpacing = parseFloat(q('h-letter-spacing').value);
       const fontWeight = parseInt(q('h-font-weight').value, 10);
-      const strokeThickness = parseFloat(q('h-stroke-thickness').value);
+      const strokeThicknessPct = parseFloat(q('h-stroke-thickness').value);
+      const strokeWidthPx = (fontSize * strokeThicknessPct) / 100;
       const logoScalePct = parseFloat(q('h-logo-scale').value);
       const logoScale = logoScalePct / 100;
       const gap = parseFloat(q('h-gap').value);
@@ -564,7 +566,7 @@
       setOutput('h-font-size-val', `${fontSize.toFixed(0)} px`);
       setOutput('h-letter-spacing-val', `${letterSpacing.toFixed(1)} px`);
       setOutput('h-font-weight-val', `${fontWeight}`);
-      setOutput('h-stroke-thickness-val', `${strokeThickness.toFixed(2)} px`);
+      setOutput('h-stroke-thickness-val', `${strokeThicknessPct.toFixed(2)}%`);
       setOutput('h-logo-scale-val', `${logoScalePct.toFixed(0)}%`);
       setOutput('h-gap-val', `${gap.toFixed(0)} px`);
 
@@ -604,9 +606,9 @@
       textEl.setAttribute('font-style', isItalic ? 'italic' : 'normal');
       textEl.setAttribute('font-variant', isSmallCaps ? 'small-caps' : 'normal');
       textEl.setAttribute('fill', '#000000');
-      if (strokeThickness > 0) {
+      if (strokeThicknessPct > 0) {
         textEl.setAttribute('stroke', '#000000');
-        textEl.setAttribute('stroke-width', String(strokeThickness));
+        textEl.setAttribute('stroke-width', String(strokeWidthPx));
         textEl.setAttribute('paint-order', 'stroke fill');
         textEl.setAttribute('stroke-linejoin', 'round');
         textEl.setAttribute('stroke-linecap', 'round');
