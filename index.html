@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AKSMED Logo Vector Preview</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #171a21;
+      --line: #2d3340;
+      --text: #eef1f7;
+      --muted: #b5bed3;
+      --accent: #f2d07f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top right, #1e2430, var(--bg) 45%);
+      color: var(--text);
+    }
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.6rem;
+      letter-spacing: 0.02em;
+    }
+    p {
+      margin: 0 0 16px;
+      color: var(--muted);
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    a.btn {
+      text-decoration: none;
+      color: #141414;
+      background: var(--accent);
+      border: 1px solid #e4bc5d;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: linear-gradient(180deg, #1b1f29, var(--panel));
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+      color: #dce3f8;
+      font-weight: 700;
+    }
+    .frame {
+      width: 100%;
+      aspect-ratio: 1/1;
+      background: #0b0d12;
+      border: 1px solid #2b3242;
+      border-radius: 8px;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+    }
+    .frame.white { background: #fff; }
+    img, object {
+      max-width: 100%;
+      max-height: 100%;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .note {
+      margin-top: 14px;
+      font-size: 0.9rem;
+      color: #a8b2c9;
+    }
+    .metrics {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+    .metric {
+      background: #151926;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .metric .k {
+      display: block;
+      font-size: 0.8rem;
+      color: #9cabcb;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .metric .v {
+      display: block;
+      margin-top: 4px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #f8fbff;
+    }
+    .iter-wrap {
+      margin-top: 20px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: linear-gradient(180deg, #1a1f2b, #141923);
+      overflow: hidden;
+    }
+    .iter-head {
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      color: #d5def5;
+      font-weight: 700;
+    }
+    .iter-table-wrap {
+      overflow: auto;
+      max-height: 350px;
+      border-bottom: 1px solid var(--line);
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      min-width: 980px;
+      font-size: 0.9rem;
+    }
+    th, td {
+      border-bottom: 1px solid #2a3243;
+      padding: 8px 10px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    th {
+      position: sticky;
+      top: 0;
+      background: #171d29;
+      color: #c6d2ee;
+      z-index: 1;
+    }
+    .iter-cards {
+      padding: 12px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 10px;
+    }
+    .mini {
+      border: 1px solid #2a3243;
+      border-radius: 10px;
+      background: #101520;
+      padding: 8px;
+    }
+    .mini .meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 0.84rem;
+      color: #b6c3df;
+    }
+    .mini .frame {
+      aspect-ratio: 3 / 4;
+    }
+    .editor-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: #b5c1db;
+    }
+    .field input {
+      border: 1px solid #2b3446;
+      background: #0f141d;
+      color: #f1f5ff;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 0.98rem;
+    }
+    code {
+      background: #11151d;
+      border: 1px solid #2b3446;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>AKSMED Logo Vector Preview</h1>
+    <p>Quick local preview for the extracted symbol vector from <code>logo.png</code> with editable text overlay.</p>
+
+    <div class="actions">
+      <a class="btn" href="logo-symbol.svg" download>Download Symbol SVG</a>
+      <a class="btn" href="logo-editable.svg" download>Download Editable SVG</a>
+      <a class="btn" href="logo-vector.svg" download>Download SVG (Display)</a>
+      <a class="btn" href="logo-laser.svg" download>Download SVG (Laser)</a>
+      <a class="btn" href="logo-mask.png" download>Download PNG Mask</a>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <h2>Original Photo</h2>
+        <div class="frame"><img src="logo.png" alt="Original logo photo" /></div>
+      </section>
+
+      <section class="card">
+        <h2>Extracted Mask</h2>
+        <div class="frame white"><img src="logo-mask.png" alt="Extracted logo mask" /></div>
+      </section>
+
+      <section class="card">
+        <h2>Symbol Only (SVG)</h2>
+        <div class="frame white"><object data="logo-vector.svg" type="image/svg+xml"></object></div>
+      </section>
+
+      <section class="card">
+        <h2>Editable Text (Normal Font)</h2>
+        <div class="editor-controls">
+          <label class="field">
+            <span>Line 1</span>
+            <input id="line1-input" type="text" value="AKSMED" />
+          </label>
+          <label class="field">
+            <span>Line 2</span>
+            <input id="line2-input" type="text" value="CLINIQUE" />
+          </label>
+        </div>
+        <div class="frame white"><object id="editable-svg" data="logo-editable.svg" type="image/svg+xml"></object></div>
+      </section>
+    </div>
+
+    <div class="metrics" id="metrics"></div>
+
+    <section class="iter-wrap">
+      <div class="iter-head">Iteration Comparison (SVG vs target mask)</div>
+      <div class="iter-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>ID</th>
+              <th>Score</th>
+              <th>F1</th>
+              <th>IoU</th>
+              <th>Precision</th>
+              <th>Recall</th>
+              <th>Paths</th>
+              <th>Tolerance</th>
+              <th>Min Area</th>
+              <th>SVG</th>
+            </tr>
+          </thead>
+          <tbody id="iter-rows"></tbody>
+        </table>
+      </div>
+      <div class="iter-cards" id="iter-cards"></div>
+    </section>
+
+    <p class="note">To open: run <code>node server.js</code> in this folder, then visit <code>http://localhost:8080</code>.</p>
+  </div>
+  <script>
+    function fmt(n) {
+      return typeof n === "number" ? n.toFixed(6).replace(/0+$/, "").replace(/\.$/, "") : n;
+    }
+
+    function metric(label, value) {
+      return `<div class="metric"><span class="k">${label}</span><span class="v">${value}</span></div>`;
+    }
+
+    async function loadIterations() {
+      const rowsEl = document.getElementById("iter-rows");
+      const cardsEl = document.getElementById("iter-cards");
+      const metricsEl = document.getElementById("metrics");
+
+      try {
+        const res = await fetch("iterations/vector-compare.json", { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const all = data.all || [];
+        const best = data.best || null;
+
+        if (!best || !all.length) throw new Error("Missing comparison data");
+
+        metricsEl.innerHTML = [
+          metric("Best Candidate", `#${best.id}`),
+          metric("Best Score", fmt(best.score)),
+          metric("Best F1", fmt(best.f1)),
+          metric("Best IoU", fmt(best.iou)),
+          metric("Precision", fmt(best.precision)),
+          metric("Recall", fmt(best.recall)),
+          metric("Paths", String(best.paths)),
+          metric("Candidates", String(data.candidate_count || all.length))
+        ].join("");
+
+        const sorted = [...all].sort((a, b) => b.score - a.score);
+        rowsEl.innerHTML = sorted.map((c, i) => `
+          <tr>
+            <td>${i + 1}</td>
+            <td>${c.id}</td>
+            <td>${fmt(c.score)}</td>
+            <td>${fmt(c.f1)}</td>
+            <td>${fmt(c.iou)}</td>
+            <td>${fmt(c.precision)}</td>
+            <td>${fmt(c.recall)}</td>
+            <td>${c.paths}</td>
+            <td>${c.tolerance}</td>
+            <td>${c.min_area}</td>
+            <td><a href="${c.svg}" download>download</a></td>
+          </tr>
+        `).join("");
+
+        cardsEl.innerHTML = sorted.slice(0, 6).map((c, i) => `
+          <article class="mini">
+            <div class="meta">
+              <strong>Rank ${i + 1} (ID ${c.id})</strong>
+              <span>F1 ${fmt(c.f1)}</span>
+            </div>
+            <div class="frame white">
+              <object data="${c.svg}" type="image/svg+xml"></object>
+            </div>
+          </article>
+        `).join("");
+      } catch (err) {
+        rowsEl.innerHTML = `<tr><td colspan="11">Failed to load iteration data: ${err.message}</td></tr>`;
+        metricsEl.innerHTML = metric("Iteration Data", "Not loaded");
+      }
+    }
+
+    function initEditableTextPreview() {
+      const line1Input = document.getElementById("line1-input");
+      const line2Input = document.getElementById("line2-input");
+      const editableObj = document.getElementById("editable-svg");
+
+      function sync() {
+        const doc = editableObj.contentDocument;
+        if (!doc) return;
+        const line1 = doc.getElementById("line1");
+        const line2 = doc.getElementById("line2");
+        if (line1) line1.textContent = line1Input.value || " ";
+        if (line2) line2.textContent = line2Input.value || " ";
+      }
+
+      editableObj.addEventListener("load", sync);
+      line1Input.addEventListener("input", sync);
+      line2Input.addEventListener("input", sync);
+      sync();
+    }
+
+    loadIterations();
+    initEditableTextPreview();
+  </script>
+</body>
+</html>
