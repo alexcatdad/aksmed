@@ -73,6 +73,16 @@
       color: var(--muted);
       font-size: 0.84rem;
     }
+    .gold-control {
+      min-width: 210px;
+    }
+    .gold-control[hidden] {
+      display: none;
+    }
+    .gold-control input[type="range"] {
+      width: 140px;
+      margin: 0 2px;
+    }
     .color-control input[type="color"] {
       width: 34px;
       height: 34px;
@@ -213,6 +223,14 @@
           <option value="solid" selected>Solid</option>
           <option value="gold">Gold (Filtered)</option>
         </select>
+      </label>
+      <label id="gold-lightness-wrap" class="color-control gold-control" hidden>Gold Lightness
+        <input id="gold-lightness" type="range" min="0" max="100" step="1" value="62" />
+        <span id="gold-lightness-val" class="color-chip">62%</span>
+      </label>
+      <label id="gold-darkness-wrap" class="color-control gold-control" hidden>Gold Darkness
+        <input id="gold-darkness" type="range" min="0" max="100" step="1" value="38" />
+        <span id="gold-darkness-val" class="color-chip">38%</span>
       </label>
       <label class="color-control">Brand Color
         <input id="brand-color" type="color" value="#000000" />
@@ -444,10 +462,56 @@
       return getPaintMode() === 'gold';
     }
 
+    function clamp(v, min, max) {
+      return Math.max(min, Math.min(max, v));
+    }
+
+    function toHex(n) {
+      const s = Math.round(clamp(n, 0, 255)).toString(16);
+      return s.length === 1 ? `0${s}` : s;
+    }
+
+    function hslToHex(h, s, l) {
+      const hh = ((h % 360) + 360) % 360;
+      const ss = clamp(s, 0, 100) / 100;
+      const ll = clamp(l, 0, 100) / 100;
+      const c = (1 - Math.abs(2 * ll - 1)) * ss;
+      const x = c * (1 - Math.abs(((hh / 60) % 2) - 1));
+      const m = ll - c / 2;
+      let r = 0;
+      let g = 0;
+      let b = 0;
+      if (hh < 60) [r, g, b] = [c, x, 0];
+      else if (hh < 120) [r, g, b] = [x, c, 0];
+      else if (hh < 180) [r, g, b] = [0, c, x];
+      else if (hh < 240) [r, g, b] = [0, x, c];
+      else if (hh < 300) [r, g, b] = [x, 0, c];
+      else [r, g, b] = [c, 0, x];
+      return `#${toHex((r + m) * 255)}${toHex((g + m) * 255)}${toHex((b + m) * 255)}`;
+    }
+
+    function getGoldTuning() {
+      const lightRaw = parseFloat((q('gold-lightness') && q('gold-lightness').value) || '62');
+      const darkRaw = parseFloat((q('gold-darkness') && q('gold-darkness').value) || '38');
+      return {
+        lightness: clamp(lightRaw, 0, 100),
+        darkness: clamp(darkRaw, 0, 100)
+      };
+    }
+
     function syncPaintModeUI() {
       const gold = isGoldMode();
       const colorInput = q('brand-color');
       const colorOut = q('brand-color-val');
+      const lightWrap = q('gold-lightness-wrap');
+      const darkWrap = q('gold-darkness-wrap');
+      const tuning = getGoldTuning();
+
+      if (lightWrap) lightWrap.hidden = !gold;
+      if (darkWrap) darkWrap.hidden = !gold;
+      setOutput('gold-lightness-val', `${Math.round(tuning.lightness)}%`);
+      setOutput('gold-darkness-val', `${Math.round(tuning.darkness)}%`);
+
       if (colorInput) {
         colorInput.disabled = gold;
         colorInput.title = gold ? 'Disabled while gold style is enabled.' : '';
@@ -461,6 +525,7 @@
     function ensureGoldDefs(svgRoot) {
       if (!svgRoot) return;
       const ns = 'http://www.w3.org/2000/svg';
+      const tuning = getGoldTuning();
 
       let defs = svgRoot.querySelector('defs');
       if (!defs) {
@@ -468,107 +533,109 @@
         svgRoot.insertBefore(defs, svgRoot.firstChild);
       }
 
-      if (!svgRoot.querySelector('#gold-fill-gradient')) {
-        const grad = document.createElementNS(ns, 'linearGradient');
-        grad.setAttribute('id', 'gold-fill-gradient');
-        grad.setAttribute('x1', '0%');
-        grad.setAttribute('y1', '0%');
-        grad.setAttribute('x2', '0%');
-        grad.setAttribute('y2', '100%');
+      const baseLight = 35 + tuning.lightness * 0.55;
+      const baseDark = 5 + tuning.darkness * 0.55;
+      const topL = clamp(baseLight + 10, 46, 96);
+      const hiL = clamp(baseLight, 35, 90);
+      const midL = clamp((baseLight + baseDark) / 2, 18, 80);
+      const lowL = clamp(baseDark, 6, 62);
+      const edgeL = clamp(baseDark + 8, 10, 70);
 
-        const stops = [
-          { o: '0%', c: '#fff6cc' },
-          { o: '22%', c: '#f5d87a' },
-          { o: '47%', c: '#c99b2a' },
-          { o: '70%', c: '#b78313' },
-          { o: '100%', c: '#f8e6a0' }
-        ];
-        for (const s of stops) {
-          const stop = document.createElementNS(ns, 'stop');
-          stop.setAttribute('offset', s.o);
-          stop.setAttribute('stop-color', s.c);
-          grad.appendChild(stop);
-        }
-        defs.appendChild(grad);
-      }
+      defs.querySelector('#gold-fill-gradient')?.remove();
+      const fillGrad = document.createElementNS(ns, 'linearGradient');
+      fillGrad.setAttribute('id', 'gold-fill-gradient');
+      fillGrad.setAttribute('x1', '0%');
+      fillGrad.setAttribute('y1', '0%');
+      fillGrad.setAttribute('x2', '0%');
+      fillGrad.setAttribute('y2', '100%');
+      [
+        { o: '0%', c: hslToHex(46, 82, topL) },
+        { o: '22%', c: hslToHex(45, 78, hiL) },
+        { o: '48%', c: hslToHex(42, 70, midL) },
+        { o: '72%', c: hslToHex(39, 72, lowL) },
+        { o: '100%', c: hslToHex(46, 76, edgeL) }
+      ].forEach((s) => {
+        const stop = document.createElementNS(ns, 'stop');
+        stop.setAttribute('offset', s.o);
+        stop.setAttribute('stop-color', s.c);
+        fillGrad.appendChild(stop);
+      });
+      defs.appendChild(fillGrad);
 
-      if (!svgRoot.querySelector('#gold-stroke-gradient')) {
-        const grad = document.createElementNS(ns, 'linearGradient');
-        grad.setAttribute('id', 'gold-stroke-gradient');
-        grad.setAttribute('x1', '0%');
-        grad.setAttribute('y1', '0%');
-        grad.setAttribute('x2', '100%');
-        grad.setAttribute('y2', '100%');
+      defs.querySelector('#gold-stroke-gradient')?.remove();
+      const strokeGrad = document.createElementNS(ns, 'linearGradient');
+      strokeGrad.setAttribute('id', 'gold-stroke-gradient');
+      strokeGrad.setAttribute('x1', '0%');
+      strokeGrad.setAttribute('y1', '0%');
+      strokeGrad.setAttribute('x2', '100%');
+      strokeGrad.setAttribute('y2', '100%');
+      [
+        { o: '0%', c: hslToHex(47, 76, clamp(topL - 6, 30, 94)) },
+        { o: '50%', c: hslToHex(42, 68, clamp(midL - 4, 12, 82)) },
+        { o: '100%', c: hslToHex(37, 74, clamp(lowL - 8, 4, 56)) }
+      ].forEach((s) => {
+        const stop = document.createElementNS(ns, 'stop');
+        stop.setAttribute('offset', s.o);
+        stop.setAttribute('stop-color', s.c);
+        strokeGrad.appendChild(stop);
+      });
+      defs.appendChild(strokeGrad);
 
-        const stops = [
-          { o: '0%', c: '#fff2b3' },
-          { o: '50%', c: '#d0a038' },
-          { o: '100%', c: '#8c6408' }
-        ];
-        for (const s of stops) {
-          const stop = document.createElementNS(ns, 'stop');
-          stop.setAttribute('offset', s.o);
-          stop.setAttribute('stop-color', s.c);
-          grad.appendChild(stop);
-        }
-        defs.appendChild(grad);
-      }
+      const contrast = clamp((tuning.lightness - tuning.darkness + 100) / 200, 0.2, 0.95);
+      defs.querySelector('#gold-metal-filter')?.remove();
+      const filter = document.createElementNS(ns, 'filter');
+      filter.setAttribute('id', 'gold-metal-filter');
+      filter.setAttribute('x', '-24%');
+      filter.setAttribute('y', '-24%');
+      filter.setAttribute('width', '148%');
+      filter.setAttribute('height', '148%');
+      filter.setAttribute('color-interpolation-filters', 'sRGB');
 
-      if (!svgRoot.querySelector('#gold-metal-filter')) {
-        const filter = document.createElementNS(ns, 'filter');
-        filter.setAttribute('id', 'gold-metal-filter');
-        filter.setAttribute('x', '-20%');
-        filter.setAttribute('y', '-20%');
-        filter.setAttribute('width', '140%');
-        filter.setAttribute('height', '140%');
-        filter.setAttribute('color-interpolation-filters', 'sRGB');
+      const shadow = document.createElementNS(ns, 'feDropShadow');
+      shadow.setAttribute('dx', '0.8');
+      shadow.setAttribute('dy', '1.0');
+      shadow.setAttribute('stdDeviation', '0.9');
+      shadow.setAttribute('flood-color', hslToHex(34, 68, clamp(8 + tuning.darkness * 0.22, 8, 30)));
+      shadow.setAttribute('flood-opacity', String((0.22 + tuning.darkness * 0.004).toFixed(2)));
+      filter.appendChild(shadow);
 
-        const shadow = document.createElementNS(ns, 'feDropShadow');
-        shadow.setAttribute('dx', '0.6');
-        shadow.setAttribute('dy', '0.8');
-        shadow.setAttribute('stdDeviation', '0.8');
-        shadow.setAttribute('flood-color', '#5a3f07');
-        shadow.setAttribute('flood-opacity', '0.45');
-        filter.appendChild(shadow);
+      const blur = document.createElementNS(ns, 'feGaussianBlur');
+      blur.setAttribute('in', 'SourceAlpha');
+      blur.setAttribute('stdDeviation', '0.72');
+      blur.setAttribute('result', 'gold-alpha');
+      filter.appendChild(blur);
 
-        const blur = document.createElementNS(ns, 'feGaussianBlur');
-        blur.setAttribute('in', 'SourceAlpha');
-        blur.setAttribute('stdDeviation', '0.6');
-        blur.setAttribute('result', 'gold-alpha');
-        filter.appendChild(blur);
+      const light = document.createElementNS(ns, 'feSpecularLighting');
+      light.setAttribute('in', 'gold-alpha');
+      light.setAttribute('surfaceScale', String((1.5 + contrast * 2.6).toFixed(2)));
+      light.setAttribute('specularConstant', String((0.30 + contrast * 0.52).toFixed(2)));
+      light.setAttribute('specularExponent', String(Math.round(20 + contrast * 24)));
+      light.setAttribute('lighting-color', hslToHex(50, 86, clamp(88 + tuning.lightness * 0.07, 86, 96)));
+      light.setAttribute('result', 'gold-spec');
+      const point = document.createElementNS(ns, 'fePointLight');
+      point.setAttribute('x', '-220');
+      point.setAttribute('y', '-190');
+      point.setAttribute('z', String(Math.round(220 + tuning.lightness * 1.3)));
+      light.appendChild(point);
+      filter.appendChild(light);
 
-        const light = document.createElementNS(ns, 'feSpecularLighting');
-        light.setAttribute('in', 'gold-alpha');
-        light.setAttribute('surfaceScale', '2.2');
-        light.setAttribute('specularConstant', '0.5');
-        light.setAttribute('specularExponent', '28');
-        light.setAttribute('lighting-color', '#fff8d8');
-        light.setAttribute('result', 'gold-spec');
-        const point = document.createElementNS(ns, 'fePointLight');
-        point.setAttribute('x', '-220');
-        point.setAttribute('y', '-180');
-        point.setAttribute('z', '280');
-        light.appendChild(point);
-        filter.appendChild(light);
+      const comp = document.createElementNS(ns, 'feComposite');
+      comp.setAttribute('in', 'gold-spec');
+      comp.setAttribute('in2', 'SourceAlpha');
+      comp.setAttribute('operator', 'in');
+      comp.setAttribute('result', 'gold-spec-mask');
+      filter.appendChild(comp);
 
-        const comp = document.createElementNS(ns, 'feComposite');
-        comp.setAttribute('in', 'gold-spec');
-        comp.setAttribute('in2', 'SourceAlpha');
-        comp.setAttribute('operator', 'in');
-        comp.setAttribute('result', 'gold-spec-mask');
-        filter.appendChild(comp);
+      const merge = document.createElementNS(ns, 'feMerge');
+      const m1 = document.createElementNS(ns, 'feMergeNode');
+      m1.setAttribute('in', 'SourceGraphic');
+      merge.appendChild(m1);
+      const m2 = document.createElementNS(ns, 'feMergeNode');
+      m2.setAttribute('in', 'gold-spec-mask');
+      merge.appendChild(m2);
+      filter.appendChild(merge);
 
-        const merge = document.createElementNS(ns, 'feMerge');
-        const m1 = document.createElementNS(ns, 'feMergeNode');
-        m1.setAttribute('in', 'SourceGraphic');
-        merge.appendChild(m1);
-        const m2 = document.createElementNS(ns, 'feMergeNode');
-        m2.setAttribute('in', 'gold-spec-mask');
-        merge.appendChild(m2);
-        filter.appendChild(merge);
-
-        defs.appendChild(filter);
-      }
+      defs.appendChild(filter);
     }
 
     function applyPaintToNode(svgRoot, node, color) {
@@ -912,6 +979,16 @@
     q('h-font-italic').addEventListener('change', applyHorizontalControls);
     q('h-font-small-caps').addEventListener('change', applyHorizontalControls);
     q('paint-mode').addEventListener('change', () => {
+      syncPaintModeUI();
+      applyControls();
+      applyHorizontalControls();
+    });
+    q('gold-lightness').addEventListener('input', () => {
+      syncPaintModeUI();
+      applyControls();
+      applyHorizontalControls();
+    });
+    q('gold-darkness').addEventListener('input', () => {
       syncPaintModeUI();
       applyControls();
       applyHorizontalControls();
