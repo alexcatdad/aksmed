@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Baskervville:ital@0;1&family=Cormorant+Garamond:wght@500;600;700&family=Crimson+Text:wght@600;700&family=EB+Garamond:wght@500;600;700&family=Libre+Baskerville:wght@400;700&family=Lora:wght@500;600;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@600;700&family=Source+Serif+4:wght@500;600;700&display=swap" rel="stylesheet" />
-  <title>AKSMED Logo Preview (Latest)</title>
+  <title>AKSMED Editable Preview</title>
   <style>
     :root {
       --bg: #101218;
@@ -33,7 +33,7 @@
     }
     h1 {
       margin: 0 0 6px;
-      font-size: 1.55rem;
+      font-size: 1.5rem;
     }
     p {
       margin: 0 0 14px;
@@ -43,8 +43,8 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-bottom: 16px;
       align-items: center;
+      margin-bottom: 14px;
     }
     .btn {
       display: inline-block;
@@ -68,7 +68,7 @@
     }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
       gap: 14px;
     }
     .card {
@@ -84,16 +84,14 @@
     .frame {
       border: 1px solid #2a3140;
       border-radius: 9px;
-      background: #fff;
       width: 100%;
       aspect-ratio: 1 / 1;
       overflow: hidden;
       display: grid;
       place-items: center;
+      background: #fff;
     }
-    .frame.dark {
-      background: #0c0f15;
-    }
+    .frame.dark { background: #0c0f15; }
     .frame img,
     .frame svg {
       width: 100%;
@@ -101,12 +99,11 @@
       object-fit: contain;
       display: block;
     }
-    #symbol-preview svg,
     #editable-preview svg {
       shape-rendering: geometricPrecision;
       text-rendering: geometricPrecision;
     }
-    .editor {
+    .controls {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 8px;
@@ -119,7 +116,7 @@
       font-size: 0.84rem;
       color: var(--muted);
     }
-    input {
+    input, select {
       border: 1px solid #2a3140;
       border-radius: 7px;
       padding: 8px 10px;
@@ -127,36 +124,35 @@
       background: #0f141d;
       color: var(--text);
     }
-    select {
-      border: 1px solid #2a3140;
-      border-radius: 7px;
-      padding: 8px 10px;
-      font-size: 0.96rem;
-      background: #0f141d;
-      color: var(--text);
+    input[type="range"] {
+      padding: 0;
+      accent-color: var(--accent);
+    }
+    .range-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .range-row output {
+      min-width: 60px;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      color: #d8e3ff;
+      font-size: 0.82rem;
     }
     .status {
       margin-top: 10px;
       font-size: 0.84rem;
       color: #9eb1da;
     }
-    code {
-      border: 1px solid #2b3345;
-      background: #111622;
-      border-radius: 6px;
-      padding: 2px 6px;
-    }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>AKSMED Logo Preview (Latest Build)</h1>
-    <p>This page fetches the current SVG files with cache-busting so you always see newest renders.</p>
+    <h1>AKSMED Editable Logo Preview</h1>
+    <p>Only original image and editable text preview. This page always loads the latest SVG.</p>
 
     <div class="actions">
-      <a class="btn" href="logo-symbol.svg" download>Download Symbol SVG</a>
-      <a class="btn" href="logo-editable.svg" download>Download Editable SVG</a>
-      <a class="btn" href="logo-laser.svg" download>Download Laser SVG</a>
       <button id="download-current-btn" class="btn" type="button">Download Current Editable</button>
       <button id="refresh-btn" class="btn" type="button">Refresh Latest</button>
       <label class="small"><input id="auto-refresh" type="checkbox" checked />Auto refresh (2s)</label>
@@ -164,25 +160,16 @@
 
     <div class="grid">
       <section class="card">
-        <h2>Original Photo</h2>
-        <div class="frame dark"><img src="logo.png" alt="Original source photo" /></div>
+        <h2>Original Image</h2>
+        <div class="frame dark"><img src="logo.png" alt="Original source" /></div>
       </section>
 
       <section class="card">
-        <h2>Current Binary Mask</h2>
-        <div class="frame dark"><img id="mask-img" src="logo-mask.png" alt="Current extracted mask" /></div>
-      </section>
-
-      <section class="card">
-        <h2>Latest Symbol SVG (No Cache)</h2>
-        <div id="symbol-preview" class="frame"></div>
-      </section>
-
-      <section class="card">
-        <h2>Editable Text SVG (No Cache)</h2>
-        <div class="editor">
+        <h2>Editable Text</h2>
+        <div class="controls">
           <label>Line 1<input id="line1" type="text" value="AKSMED" /></label>
           <label>Line 2<input id="line2" type="text" value="CLINIQUE" /></label>
+
           <label>Serif Font
             <select id="font-picker">
               <option value="Playfair Display, Georgia, serif">Playfair Display</option>
@@ -197,17 +184,53 @@
               <option value="Times New Roman, Times, serif">Times New Roman</option>
             </select>
           </label>
+
+          <label>Font Size
+            <div class="range-row">
+              <input id="font-size" type="range" min="48" max="180" step="1" value="109" />
+              <output id="font-size-val">109 px</output>
+            </div>
+          </label>
+
+          <label>Letter Spacing
+            <div class="range-row">
+              <input id="letter-spacing" type="range" min="-2" max="12" step="0.1" value="2" />
+              <output id="letter-spacing-val">2 px</output>
+            </div>
+          </label>
+
+          <label>Line Spacing
+            <div class="range-row">
+              <input id="line-spacing" type="range" min="0.7" max="1.6" step="0.01" value="1.0" />
+              <output id="line-spacing-val">1.00x</output>
+            </div>
+          </label>
         </div>
+
         <div id="editable-preview" class="frame"></div>
       </section>
     </div>
 
-    <div class="status" id="status">Loading latest assets...</div>
-    <p class="status">Server command: <code>node server.js</code> then open <code>http://localhost:8080</code>.</p>
+    <div class="status" id="status">Loading latest editable SVG...</div>
   </div>
 
   <script>
-    const state = { editableSvg: null, timer: null };
+    const state = {
+      editableSvg: null,
+      timer: null,
+      baseY1: null,
+      baseY2: null,
+      baseSize: 109,
+      baseSpacing: 2
+    };
+
+    function q(id) {
+      return document.getElementById(id);
+    }
+
+    function setOutput(id, value) {
+      q(id).textContent = value;
+    }
 
     async function fetchTextNoCache(path) {
       const v = Date.now();
@@ -225,21 +248,59 @@
       return svg;
     }
 
-    function applyEditableText() {
+    function initControlDefaultsFromSvg() {
       if (!state.editableSvg) return;
-      const l1 = document.getElementById('line1').value || ' ';
-      const l2 = document.getElementById('line2').value || ' ';
-      const font = document.getElementById('font-picker').value;
       const t1 = state.editableSvg.querySelector('#line1');
       const t2 = state.editableSvg.querySelector('#line2');
-      if (t1) {
-        t1.textContent = l1;
-        t1.setAttribute('font-family', font);
+      if (!t1 || !t2) return;
+
+      const y1 = parseFloat(t1.getAttribute('y') || '0');
+      const y2 = parseFloat(t2.getAttribute('y') || '0');
+      const fs = parseFloat(t1.getAttribute('font-size') || '109');
+      const ls = parseFloat(t1.getAttribute('letter-spacing') || '2');
+
+      state.baseY1 = y1;
+      state.baseY2 = y2;
+      state.baseSize = fs;
+      state.baseSpacing = ls;
+
+      q('font-size').value = String(Math.round(fs));
+      q('letter-spacing').value = String(ls);
+      const lineSpace = (y2 > y1 && fs > 0) ? ((y2 - y1) / fs) : 1.0;
+      q('line-spacing').value = String(Math.max(0.7, Math.min(1.6, lineSpace)));
+    }
+
+    function applyControls() {
+      if (!state.editableSvg) return;
+
+      const line1 = q('line1').value || ' ';
+      const line2 = q('line2').value || ' ';
+      const font = q('font-picker').value;
+      const fontSize = parseFloat(q('font-size').value);
+      const letterSpacing = parseFloat(q('letter-spacing').value);
+      const lineSpacing = parseFloat(q('line-spacing').value);
+
+      setOutput('font-size-val', `${fontSize.toFixed(0)} px`);
+      setOutput('letter-spacing-val', `${letterSpacing.toFixed(1)} px`);
+      setOutput('line-spacing-val', `${lineSpacing.toFixed(2)}x`);
+
+      const t1 = state.editableSvg.querySelector('#line1');
+      const t2 = state.editableSvg.querySelector('#line2');
+      if (!t1 || !t2) return;
+
+      const y1 = state.baseY1 ?? parseFloat(t1.getAttribute('y') || '0');
+      const y2 = y1 + fontSize * lineSpacing;
+
+      for (const t of [t1, t2]) {
+        t.setAttribute('font-family', font);
+        t.setAttribute('font-size', String(fontSize));
+        t.setAttribute('letter-spacing', String(letterSpacing));
       }
-      if (t2) {
-        t2.textContent = l2;
-        t2.setAttribute('font-family', font);
-      }
+
+      t1.setAttribute('y', String(y1));
+      t2.setAttribute('y', String(y2));
+      t1.textContent = line1;
+      t2.textContent = line2;
     }
 
     function downloadCurrentEditable() {
@@ -257,28 +318,17 @@
     }
 
     async function loadLatest() {
-      const status = document.getElementById('status');
+      const status = q('status');
       try {
-        const [symbolText, editableText] = await Promise.all([
-          fetchTextNoCache('logo-symbol.svg'),
-          fetchTextNoCache('logo-editable.svg')
-        ]);
-
-        const symbolSvg = parseSvg(symbolText);
+        const editableText = await fetchTextNoCache('logo-editable.svg');
         const editableSvg = parseSvg(editableText);
+        state.editableSvg = document.importNode(editableSvg, true);
+        q('editable-preview').replaceChildren(state.editableSvg);
 
-        const symbolHost = document.getElementById('symbol-preview');
-        const editableHost = document.getElementById('editable-preview');
+        initControlDefaultsFromSvg();
+        applyControls();
 
-        symbolHost.replaceChildren(symbolHost.ownerDocument.importNode(symbolSvg, true));
-        state.editableSvg = editableHost.ownerDocument.importNode(editableSvg, true);
-        editableHost.replaceChildren(state.editableSvg);
-
-        applyEditableText();
-
-        const mv = Date.now();
-        document.getElementById('mask-img').src = `logo-mask.png?v=${mv}`;
-        status.textContent = `Latest assets loaded: ${new Date().toLocaleTimeString()}`;
+        status.textContent = `Latest editable SVG loaded: ${new Date().toLocaleTimeString()}`;
       } catch (err) {
         status.textContent = `Load error: ${err.message}`;
       }
@@ -294,12 +344,16 @@
       }
     }
 
-    document.getElementById('refresh-btn').addEventListener('click', loadLatest);
-    document.getElementById('download-current-btn').addEventListener('click', downloadCurrentEditable);
-    document.getElementById('auto-refresh').addEventListener('change', (e) => setAutoRefresh(e.target.checked));
-    document.getElementById('line1').addEventListener('input', applyEditableText);
-    document.getElementById('line2').addEventListener('input', applyEditableText);
-    document.getElementById('font-picker').addEventListener('change', applyEditableText);
+    q('download-current-btn').addEventListener('click', downloadCurrentEditable);
+    q('refresh-btn').addEventListener('click', loadLatest);
+    q('auto-refresh').addEventListener('change', (e) => setAutoRefresh(e.target.checked));
+
+    q('line1').addEventListener('input', applyControls);
+    q('line2').addEventListener('input', applyControls);
+    q('font-picker').addEventListener('change', applyControls);
+    q('font-size').addEventListener('input', applyControls);
+    q('letter-spacing').addEventListener('input', applyControls);
+    q('line-spacing').addEventListener('input', applyControls);
 
     setAutoRefresh(true);
     loadLatest();
