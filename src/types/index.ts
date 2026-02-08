@@ -5,6 +5,8 @@ export interface FontOption {
 }
 
 export interface PortraitParams {
+	pw: number;
+	ph: number;
 	l1: string;
 	l2: string;
 	f: string;
@@ -16,11 +18,14 @@ export interface PortraitParams {
 	fw: number;
 	st: number;
 	sc: number;
+	ty: number;
 	it: boolean;
 	smc: boolean;
 }
 
 export interface HorizontalParams {
+	hw: number;
+	hh: number;
 	ht: string;
 	hf: string;
 	hfs: number;

@@ -24,6 +24,7 @@
 	--color-text-secondary: #9a9da8;
 	--color-text-muted: #5c5f6a;
 	--color-text-inverse: #0c0d10;
+	--color-label: #8a8d98;
 
 	/* Fonts */
 	--font-ui: "Instrument Sans", system-ui, sans-serif;
@@ -128,6 +129,11 @@ input[type="range"]::-webkit-slider-thumb {
 input[type="range"]::-webkit-slider-thumb:hover {
 	transform: scale(1.15);
 }
+input[type="range"]:focus-visible {
+	outline: 2px solid var(--color-gold-dim);
+	outline-offset: 4px;
+	border-radius: 2px;
+}
 input[type="range"]::-moz-range-thumb {
 	width: 14px;
 	height: 14px;
@@ -153,6 +159,10 @@ input[type="checkbox"]:checked {
 	background: var(--color-gold);
 	border-color: var(--color-gold);
 }
+input[type="checkbox"]:focus-visible {
+	outline: 2px solid var(--color-gold-dim);
+	outline-offset: 2px;
+}
 input[type="checkbox"]:checked::after {
 	content: "";
 	position: absolute;
@@ -164,6 +174,16 @@ input[type="checkbox"]:checked::after {
 	border-top: none;
 	border-left: none;
 	transform: rotate(45deg);
+}
+
+/* Hide number input spinners for cleaner look */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+input[type="number"] {
+	-moz-appearance: textfield;
 }
 
 /* Select arrows */

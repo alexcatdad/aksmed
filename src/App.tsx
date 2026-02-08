@@ -13,7 +13,7 @@ import { useSvgLoader } from "./hooks/useSvgLoader";
 import { useVersionHistory } from "./hooks/useVersionHistory";
 
 export default function App() {
-	const { editableSvg, symbolSvg, loading, error, reload } = useSvgLoader();
+	const { symbolSvg, loading, error, reload } = useSvgLoader();
 	const [portrait, setPortrait] = usePortraitParams();
 	const [horizontal, setHorizontal] = useHorizontalParams();
 	const [paint, setPaint] = usePaintParams();
@@ -34,7 +34,20 @@ export default function App() {
 
 	const applyParams = useCallback(
 		(params: Record<string, string | number | boolean>) => {
-			const hKeys = new Set(["ht", "hf", "hfs", "hls", "hfw", "hst", "hsc", "hg", "hit", "hsmc"]);
+			const hKeys = new Set([
+				"hw",
+				"hh",
+				"ht",
+				"hf",
+				"hfs",
+				"hls",
+				"hfw",
+				"hst",
+				"hsc",
+				"hg",
+				"hit",
+				"hsmc",
+			]);
 			const paKeys = new Set(["pm", "gl", "gd", "bc"]);
 			const p: Record<string, string | number | boolean> = {};
 			const h: Record<string, string | number | boolean> = {};
@@ -81,7 +94,7 @@ export default function App() {
 			<div className="grid grid-cols-2 gap-6 max-[960px]:grid-cols-1">
 				<ReferenceCard />
 				<PortraitCard
-					editableSvg={editableSvg}
+					symbolSvg={symbolSvg}
 					portrait={portrait}
 					setPortrait={setPortrait}
 					paint={paint}

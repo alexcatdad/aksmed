@@ -46,7 +46,13 @@ export function LandscapeCard({ symbolSvg, horizontal, setHorizontal, paint }: L
 				<button
 					type="button"
 					onClick={() =>
-						svgRef.current && downloadSvg(svgRef.current, "aksmed-landscape-current.svg")
+						svgRef.current &&
+						downloadSvg(
+							svgRef.current,
+							"aksmed-landscape-current.svg",
+							horizontal.hw,
+							horizontal.hh,
+						)
 					}
 					className="inline-flex items-center gap-1.5 px-3.5 py-2 font-[family-name:var(--font-ui)] text-[11px] font-semibold tracking-[0.05em] uppercase text-gold bg-transparent border border-gold-dim rounded-md cursor-pointer transition-all duration-150 hover:text-text-inverse hover:bg-gold hover:border-gold"
 				>

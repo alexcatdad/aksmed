@@ -2,6 +2,8 @@ import { parseAsBoolean, parseAsFloat, parseAsString, useQueryStates } from "nuq
 import { HORIZONTAL_DEFAULTS } from "../constants/defaults";
 
 const horizontalParsers = {
+	hw: parseAsFloat.withDefault(HORIZONTAL_DEFAULTS.hw),
+	hh: parseAsFloat.withDefault(HORIZONTAL_DEFAULTS.hh),
 	ht: parseAsString.withDefault(HORIZONTAL_DEFAULTS.ht),
 	hf: parseAsString.withDefault(HORIZONTAL_DEFAULTS.hf),
 	hfs: parseAsFloat.withDefault(HORIZONTAL_DEFAULTS.hfs),

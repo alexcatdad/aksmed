@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { FONT_OPTIONS } from "../../constants/fonts";
 
 interface FontPickerProps {
@@ -6,12 +7,18 @@ interface FontPickerProps {
 }
 
 export function FontPicker({ value, onChange }: FontPickerProps) {
+	const id = useId();
+
 	return (
 		<div className="flex flex-col gap-1.5">
-			<span className="text-[10px] font-semibold tracking-[0.08em] uppercase text-text-muted">
+			<label
+				htmlFor={id}
+				className="text-[10px] font-semibold tracking-[0.08em] uppercase text-label"
+			>
 				Typeface
-			</span>
+			</label>
 			<select
+				id={id}
 				className="w-full px-3 py-2.5 pr-8 font-[family-name:var(--font-ui)] text-[13px] text-text-primary bg-input border border-border-default rounded-md outline-none transition-[border-color] duration-150 focus:border-gold-dim"
 				value={value}
 				onChange={(e) => onChange(e.target.value)}

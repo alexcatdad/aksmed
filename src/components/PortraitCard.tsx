@@ -5,7 +5,7 @@ import { PortraitControls } from "./PortraitControls";
 import { PortraitPreview } from "./PortraitPreview";
 
 interface PortraitCardProps {
-	editableSvg: SVGSVGElement | null;
+	symbolSvg: SVGSVGElement | null;
 	portrait: PortraitParams;
 	setPortrait: (updates: Partial<PortraitParams>) => void;
 	paint: PaintParams;
@@ -29,7 +29,7 @@ function ExportIcon() {
 	);
 }
 
-export function PortraitCard({ editableSvg, portrait, setPortrait, paint }: PortraitCardProps) {
+export function PortraitCard({ symbolSvg, portrait, setPortrait, paint }: PortraitCardProps) {
 	const svgRef = useRef<SVGSVGElement | null>(null);
 
 	return (
@@ -46,7 +46,8 @@ export function PortraitCard({ editableSvg, portrait, setPortrait, paint }: Port
 				<button
 					type="button"
 					onClick={() =>
-						svgRef.current && downloadSvg(svgRef.current, "aksmed-portrait-current.svg")
+						svgRef.current &&
+						downloadSvg(svgRef.current, "aksmed-portrait-current.svg", portrait.pw, portrait.ph)
 					}
 					className="inline-flex items-center gap-1.5 px-3.5 py-2 font-[family-name:var(--font-ui)] text-[11px] font-semibold tracking-[0.05em] uppercase text-gold bg-transparent border border-gold-dim rounded-md cursor-pointer transition-all duration-150 hover:text-text-inverse hover:bg-gold hover:border-gold"
 				>
@@ -56,12 +57,7 @@ export function PortraitCard({ editableSvg, portrait, setPortrait, paint }: Port
 			</div>
 			<div className="p-5">
 				<PortraitControls portrait={portrait} setPortrait={setPortrait} />
-				<PortraitPreview
-					editableSvg={editableSvg}
-					portrait={portrait}
-					paint={paint}
-					svgRef={svgRef}
-				/>
+				<PortraitPreview symbolSvg={symbolSvg} portrait={portrait} paint={paint} svgRef={svgRef} />
 			</div>
 		</section>
 	);
