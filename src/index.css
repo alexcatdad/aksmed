@@ -1,0 +1,211 @@
+@import "tailwindcss";
+
+@theme {
+	/* Background scale */
+	--color-void: #08090b;
+	--color-base: #0c0d10;
+	--color-card: #111318;
+	--color-control: #16181e;
+	--color-input: #0a0b0d;
+
+	/* Borders */
+	--color-border-subtle: rgba(255, 255, 255, 0.04);
+	--color-border-default: rgba(255, 255, 255, 0.08);
+	--color-border-hover: rgba(255, 255, 255, 0.12);
+
+	/* Gold */
+	--color-gold: #c9a962;
+	--color-gold-dim: #a08550;
+	--color-gold-bright: #e4c878;
+	--color-gold-glow: rgba(201, 169, 98, 0.15);
+
+	/* Text */
+	--color-text-primary: #edeef2;
+	--color-text-secondary: #9a9da8;
+	--color-text-muted: #5c5f6a;
+	--color-text-inverse: #0c0d10;
+
+	/* Fonts */
+	--font-ui: "Instrument Sans", system-ui, sans-serif;
+	--font-display: "Cormorant Garamond", Georgia, serif;
+	--font-mono: ui-monospace, "SF Mono", monospace;
+
+	/* Easing */
+	--ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Base overrides — must be in @layer base so Tailwind utilities win */
+@layer base {
+	html {
+		font-size: 16px;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+	body {
+		font-family: var(--font-ui);
+		font-size: 13px;
+		line-height: 1.5;
+		color: var(--color-text-secondary);
+		background: var(--color-base);
+		min-height: 100vh;
+	}
+}
+
+/* Subtle grid texture */
+body::before {
+	content: "";
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	background-image: linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+	background-size: 48px 48px;
+	mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%);
+	z-index: 0;
+}
+
+/* Frame corner marks */
+.frame::before,
+.frame::after,
+.frame-marks::before,
+.frame-marks::after {
+	content: "";
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	border: 1px solid rgba(0, 0, 0, 0.15);
+	pointer-events: none;
+}
+.frame.dark::before,
+.frame.dark::after,
+.frame.dark .frame-marks::before,
+.frame.dark .frame-marks::after {
+	border-color: rgba(255, 255, 255, 0.1);
+}
+.frame::before {
+	top: 12px;
+	left: 12px;
+	border-right: none;
+	border-bottom: none;
+}
+.frame::after {
+	top: 12px;
+	right: 12px;
+	border-left: none;
+	border-bottom: none;
+}
+.frame-marks::before {
+	bottom: 12px;
+	left: 12px;
+	border-right: none;
+	border-top: none;
+}
+.frame-marks::after {
+	bottom: 12px;
+	right: 12px;
+	border-left: none;
+	border-top: none;
+}
+
+/* Custom range slider */
+input[type="range"] {
+	appearance: none;
+	height: 3px;
+	background: linear-gradient(90deg, var(--color-gold-dim) 0%, var(--color-border-default) 100%);
+	border-radius: 2px;
+	cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+	appearance: none;
+	width: 14px;
+	height: 14px;
+	background: var(--color-gold);
+	border: 2px solid var(--color-base);
+	border-radius: 50%;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+	transition: transform 0.1s var(--ease-smooth);
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+	transform: scale(1.15);
+}
+input[type="range"]::-moz-range-thumb {
+	width: 14px;
+	height: 14px;
+	background: var(--color-gold);
+	border: 2px solid var(--color-base);
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+/* Custom checkbox */
+input[type="checkbox"] {
+	appearance: none;
+	width: 16px;
+	height: 16px;
+	background: var(--color-input);
+	border: 1px solid var(--color-border-default);
+	border-radius: 4px;
+	cursor: pointer;
+	position: relative;
+	transition: all 0.15s var(--ease-smooth);
+}
+input[type="checkbox"]:checked {
+	background: var(--color-gold);
+	border-color: var(--color-gold);
+}
+input[type="checkbox"]:checked::after {
+	content: "";
+	position: absolute;
+	top: 2px;
+	left: 5px;
+	width: 4px;
+	height: 8px;
+	border: 2px solid var(--color-text-inverse);
+	border-top: none;
+	border-left: none;
+	transform: rotate(45deg);
+}
+
+/* Select arrows */
+select {
+	appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%235c5f6a' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 10px center;
+}
+
+/* Color input */
+input[type="color"] {
+	appearance: none;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+	background: transparent;
+}
+input[type="color"]::-webkit-color-swatch-wrapper {
+	padding: 2px;
+}
+input[type="color"]::-webkit-color-swatch {
+	border: none;
+	border-radius: 2px;
+}
+
+/* SVG preview rendering */
+.portrait-preview svg {
+	shape-rendering: geometricPrecision;
+	text-rendering: geometricPrecision;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.4;
+	}
+}
+.animate-pulse-dot {
+	animation: pulse 2s infinite;
+}
