@@ -1,0 +1,8 @@
+{
+  "$schema": "https://alexcatdad.github.io/schemas/project-meta.schema.json",
+  "what": "Interactive logo preview and typography editor for luxury medical branding.",
+  "why": "Design studio for refining logo lockups before vectorizing for print.",
+  "tags": ["react", "svg", "design-tools"],
+  "featured": false,
+  "order": 70
+}
