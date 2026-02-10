@@ -1,0 +1,12 @@
+{
+  "what": "Browser-based design studio for previewing and refining AKSMED luxury medical logo lockups.",
+  "why": "Created to iterate quickly on brand typography and composition before vectorizing for print.",
+  "tags": [
+    "branding",
+    "design-tool",
+    "logo",
+    "frontend"
+  ],
+  "featured": false,
+  "order": 50
+}
