@@ -41,3 +41,7 @@ The repo is ready for a broader push when:
 - [ ] the biggest operational gaps are closed or explicitly accepted
 - [ ] release blockers are visible and small enough to manage
 
+
+## Hosted source checks
+
+[CI checks](../docs/ci-checks.md) now define the reproducible source gate. Hosted acceptance is established by the checks on the exact PR commit; source changes alone do not prove release or deployment acceptance.

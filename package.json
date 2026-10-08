@@ -8,6 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "biome check src/",
+    "typecheck": "tsc --noEmit",
     "format": "biome format --write src/"
   },
   "dependencies": {
