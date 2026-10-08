@@ -22,4 +22,4 @@ The running log of decisions that materially affect `aksmed`.
 
 ## 2026-10-08: Public hosted CI
 
-Check locked dependencies, existing Biome rules and the Vite build on GitHub-hosted Ubuntu for pull requests and main pushes. Keep Pages publication in the existing separate workflow. See [CI checks](../docs/ci-checks.md).
+Check locked dependencies, existing Biome rules, the strict TypeScript configuration and the Vite build on GitHub-hosted Ubuntu for exact pull-request heads and main pushes. Keep Pages publication in the existing separate workflow. See [CI checks](../docs/ci-checks.md).

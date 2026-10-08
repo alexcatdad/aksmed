@@ -11,6 +11,15 @@ aliases:
 
 # Implementation Planning
 
+## Hosted validation in delivery
+
+Pull requests and main pushes run locked dependency installation, Biome,
+the strict TypeScript checker and the Vite production build on GitHub-hosted
+Ubuntu. The checks use the exact source commit and read-only permissions.
+Keep this source gate separate from the existing Pages publication workflow
+and browser acceptance. Reproduce the commands in [CI checks](../docs/ci-checks.md)
+before handing off a source change, then verify the hosted result on its PR head.
+
 The execution strategy for turning repo truth into delivery.
 
 ## Planning Philosophy
@@ -46,4 +55,3 @@ Planning is doing its job if:
 - contributors know what to read first
 - important blockers are explicit
 - release or production gaps are visible without chat archaeology
-
