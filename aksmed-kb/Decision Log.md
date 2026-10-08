@@ -19,3 +19,7 @@ The running log of decisions that materially affect `aksmed`.
 - include the decision, why it was made, and what it implies
 - link the deeper canonical doc when one exists
 
+
+## 2026-10-08: Public hosted CI
+
+Check locked dependencies, existing Biome rules and the Vite build on GitHub-hosted Ubuntu for pull requests and main pushes. Keep Pages publication in the existing separate workflow. See [CI checks](../docs/ci-checks.md).

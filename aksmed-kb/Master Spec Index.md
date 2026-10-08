@@ -38,3 +38,5 @@ Use this note when you want a stable reading path through repo truth, execution,
 - [[Human Input Checklist]]
 - [[Decision Log]]
 
+
+- [Hosted CI checks](../docs/ci-checks.md)
