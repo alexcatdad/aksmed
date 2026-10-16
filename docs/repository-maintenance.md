@@ -1,8 +1,9 @@
 # Repository maintenance
 
 The `check` job runs locked installation, Biome, TypeScript and Vite checks.
-Superseded PR checks may be cancelled; running main/manual checks and Pages
-publication are not cancelled by that PR rule. Pages still publishes only on
+Superseded PR checks may be cancelled; unique main/manual run groups preserve
+queued and running checks. Pages publication is not cancelled by that PR rule.
+Pages still publishes only on
 main pushes, serializes deployments, and grants Pages/OIDC writes only to deploy.
 Its build uses the same Bun 1.4.2 version as source checks. Source checks do not
 replace browser acceptance or successful Pages publication.
@@ -17,7 +18,10 @@ Use a checkout of `alexcatdad/ci-actions` at reviewed commit
 `3c711660203519dc638c0295cbd75434ced073f0`. Keep reports outside this checkout:
 
 ```sh
+set -eu
 umask 077
+test "$(git -C /path/to/ci-actions rev-parse HEAD)" = 3c711660203519dc638c0295cbd75434ced073f0
+test -z "$(git -C /path/to/ci-actions status --porcelain --untracked-files=all)"
 bun /path/to/ci-actions/scripts/audit-repository.ts --repo alexcatdad/aksmed > /private/review/aksmed-audit.json
 ```
 
@@ -34,6 +38,10 @@ After a fresh representative PR has successful checks, generate a plan using its
 number and review the exact payload, target, baseline and hash separately:
 
 ```sh
+set -eu
+umask 077
+test "$(git -C /path/to/ci-actions rev-parse HEAD)" = 3c711660203519dc638c0295cbd75434ced073f0
+test -z "$(git -C /path/to/ci-actions status --porcelain --untracked-files=all)"
 bun /path/to/ci-actions/scripts/create-ruleset.ts plan --repo alexcatdad/aksmed --rules /path/to/aksmed/.github/rules/main.json --evidence-pr PR_NUMBER > /private/review/aksmed-plan.json
 ```
 

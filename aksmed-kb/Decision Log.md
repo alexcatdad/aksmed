@@ -31,3 +31,7 @@ duration, and cancel only superseded PR checks. Add reviewed weekly dependency
 updates and an inert default-branch ruleset proposal. Use the pinned shared audit
 and plan tooling; settings remain a separate operation. See
 [repository maintenance](../docs/repository-maintenance.md).
+
+Pilot review correction: use unique push/manual check groups to preserve queued
+runs, and verify both the shared tooling commit and clean checkout before running
+audit or plan commands. Fresh CI and review acceptance remain required.
