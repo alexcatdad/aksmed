@@ -27,6 +27,8 @@ The running list of tasks that require a real human to provide access, credentia
 ## Product And Release Decisions
 
 - [ ] Record any scope, readiness, or release decisions that require a human call
+- [ ] Review a fresh default-branch ruleset plan and target before separately
+  approving its application; checked-in JSON does not configure GitHub settings.
 
 ## Human Validation Tasks
 

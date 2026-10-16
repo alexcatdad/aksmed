@@ -20,6 +20,9 @@ Keep this source gate separate from the existing Pages publication workflow
 and browser acceptance. Reproduce the commands in [CI checks](../docs/ci-checks.md)
 before handing off a source change, then verify the hosted result on its PR head.
 
+Review weekly dependency PRs through the same source gate. Keep repository-setting
+plans separate from source changes; use [repository maintenance](../docs/repository-maintenance.md).
+
 The execution strategy for turning repo truth into delivery.
 
 ## Planning Philosophy
