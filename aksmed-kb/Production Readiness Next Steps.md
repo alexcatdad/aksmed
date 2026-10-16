@@ -45,3 +45,8 @@ The repo is ready for a broader push when:
 ## Hosted source checks
 
 [CI checks](../docs/ci-checks.md) now define the reproducible source gate. Hosted acceptance is established by the checks on the exact PR commit; source changes alone do not prove release or deployment acceptance.
+
+- [ ] Verify the maintenance PR's source checks and subsequent main/Pages runs.
+- [ ] Review a fresh default-branch ruleset plan before separately applying it;
+  the checked-in JSON alone provides no enforcement. Follow the
+  [maintenance runbook](../docs/repository-maintenance.md).

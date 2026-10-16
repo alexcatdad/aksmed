@@ -23,3 +23,15 @@ The running log of decisions that materially affect `aksmed`.
 ## 2026-10-08: Public hosted CI
 
 Check locked dependencies, existing Biome rules, the strict TypeScript configuration and the Vite build on GitHub-hosted Ubuntu for exact pull-request heads and main pushes. Keep Pages publication in the existing separate workflow. See [CI checks](../docs/ci-checks.md).
+
+## 2026-10-16: Repository maintenance baseline
+
+Pin Pages actions and Bun, scope deployment writes to the deploy job, bound job
+duration, and cancel only superseded PR checks. Add reviewed weekly dependency
+updates and an inert default-branch ruleset proposal. Use the pinned shared audit
+and plan tooling; settings remain a separate operation. See
+[repository maintenance](../docs/repository-maintenance.md).
+
+Pilot review correction: use unique push/manual check groups to preserve queued
+runs, and verify both the shared tooling commit and clean checkout before running
+audit or plan commands. Fresh CI and review acceptance remain required.

@@ -40,3 +40,4 @@ Use this note when you want a stable reading path through repo truth, execution,
 
 
 - [Hosted CI checks](../docs/ci-checks.md)
+- [Repository maintenance](../docs/repository-maintenance.md)
